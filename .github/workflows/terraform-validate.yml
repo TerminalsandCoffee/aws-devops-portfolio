@@ -1,0 +1,67 @@
+name: terraform-validate
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - "**/*.tf"
+      - ".github/workflows/terraform-validate.yml"
+  pull_request:
+    paths:
+      - "**/*.tf"
+      - ".github/workflows/terraform-validate.yml"
+
+concurrency:
+  group: tf-validate-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false
+
+      - name: Find Terraform directories
+        id: tfdirs
+        shell: bash
+        run: |
+          set -e
+          dirs=$(git ls-files '*.tf' | xargs -n1 dirname | sort -u || true)
+          if [ -z "$dirs" ]; then
+            echo "No Terraform files found. Skipping."
+          fi
+          {
+            echo "dirs<<EOF"
+            echo "$dirs"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Terraform fmt check (all dirs)
+        if: steps.tfdirs.outputs.dirs != ''
+        shell: bash
+        run: |
+          set -e
+          while read -r dir; do
+            echo "::group::fmt $dir"
+            terraform -chdir="$dir" fmt -check -recursive
+            echo "::endgroup::"
+          done <<< "${{ steps.tfdirs.outputs.dirs }}"
+
+      - name: Terraform init + validate (all dirs)
+        if: steps.tfdirs.outputs.dirs != ''
+        shell: bash
+        run: |
+          set -e
+          while read -r dir; do
+            echo "::group::validate $dir"
+            terraform -chdir="$dir" init -backend=false -input=false -no-color
+            terraform -chdir="$dir" validate -no-color
+            echo "::endgroup::"
+          done <<< "${{ steps.tfdirs.outputs.dirs }}"
