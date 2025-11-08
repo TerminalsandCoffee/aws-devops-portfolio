@@ -113,7 +113,7 @@ resource "aws_security_group" "ecs_tasks" {
     from_port       = var.container_port
     to_port         = var.container_port
     protocol        = "tcp"
-    security_groups = [data.aws_security_group.alb.id]
+    security_groups = [var.alb_security_group_id]
   }
 
   egress {
@@ -125,14 +125,5 @@ resource "aws_security_group" "ecs_tasks" {
 
   tags = {
     Name = "${var.name}-ecs-tasks-sg"
-  }
-}
-
-# Get ALB SG (from ALB module output)
-data "aws_security_group" "alb" {
-  vpc_id = var.vpc_id
-  filter {
-    name   = "tag:Name"
-    values = ["${var.name}-alb-sg"]
   }
 }

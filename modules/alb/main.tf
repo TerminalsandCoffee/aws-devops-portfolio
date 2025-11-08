@@ -78,32 +78,32 @@ resource "aws_lb_target_group" "main" {
 # ──────────────────────────────────────────────────────────────
 # HTTP Listener (80) – Redirect to HTTPS if cert, else forward
 # ──────────────────────────────────────────────────────────────
-resource "aws_lb_listener" "http" {
+# HTTP Listener that forwards to target group (when no certificate)
+resource "aws_lb_listener" "http_forward" {
+  count             = var.certificate_arn != "" ? 0 : 1
   load_balancer_arn = aws_lb.main.arn
   port              = 80
   protocol          = "HTTP"
 
   default_action {
-    type = var.certificate_arn != "" ? "redirect" : "forward"
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.main.arn
+  }
+}
 
-    # Redirect to HTTPS if cert is provided
-    dynamic "redirect" {
-      for_each = var.certificate_arn != "" ? [1] : []
-      content {
-        port        = "443"
-        protocol    = "HTTPS"
-        status_code = "HTTP_301"
-      }
-    }
+# HTTP Listener that redirects to HTTPS (when certificate is provided)
+resource "aws_lb_listener" "http_redirect" {
+  count             = var.certificate_arn != "" ? 1 : 0
+  load_balancer_arn = aws_lb.main.arn
+  port              = 80
+  protocol          = "HTTP"
 
-    # Forward to target group if no cert
-    dynamic "forward" {
-      for_each = var.certificate_arn != "" ? [] : [1]
-      content {
-        target_group {
-          arn = aws_lb_target_group.main.arn
-        }
-      }
+  default_action {
+    type = "redirect"
+    redirect {
+      port        = "443"
+      protocol    = "HTTPS"
+      status_code = "HTTP_301"
     }
   }
 }

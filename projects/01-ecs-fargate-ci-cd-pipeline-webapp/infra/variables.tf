@@ -27,5 +27,5 @@ variable "az_count" {
 variable "enable_nat_gateway" {
   description = "Create NAT GW for private subnets"
   type        = bool
-  default     = false   # Fargate only needs public subnets
+  default     = false # Fargate only needs public subnets
 }

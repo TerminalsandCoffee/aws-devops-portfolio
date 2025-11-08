@@ -58,10 +58,10 @@ resource "aws_route_table_association" "public" {
 
 # Private subnets
 resource "aws_subnet" "private" {
-  count                   = var.az_count
-  vpc_id                  = aws_vpc.main.id
-  cidr_block              = cidrsubnet(var.cidr, 8, count.index + var.az_count)
-  availability_zone       = local.azs[count.index]
+  count             = var.az_count
+  vpc_id            = aws_vpc.main.id
+  cidr_block        = cidrsubnet(var.cidr, 8, count.index + var.az_count)
+  availability_zone = local.azs[count.index]
 
   tags = {
     Name = "${var.name}-private-${local.azs[count.index]}"
@@ -71,7 +71,7 @@ resource "aws_subnet" "private" {
 
 # NAT Gateway(s)
 resource "aws_eip" "nat" {
-  count  = var.enable_nat_gateway && (var.single_nat_gateway ? 1 : var.az_count)
+  count  = var.enable_nat_gateway ? (var.single_nat_gateway ? 1 : var.az_count) : 0
   domain = "vpc"
   tags = {
     Name = "${var.name}-nat"
@@ -79,7 +79,7 @@ resource "aws_eip" "nat" {
 }
 
 resource "aws_nat_gateway" "nat" {
-  count         = var.enable_nat_gateway && (var.single_nat_gateway ? 1 : var.az_count)
+  count         = var.enable_nat_gateway ? (var.single_nat_gateway ? 1 : var.az_count) : 0
   allocation_id = aws_eip.nat[count.index].id
   subnet_id     = aws_subnet.public[count.index % var.az_count].id
   tags = {

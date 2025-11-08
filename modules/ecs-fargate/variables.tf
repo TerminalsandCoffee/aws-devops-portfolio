@@ -44,6 +44,11 @@ variable "target_group_arn" {
   type        = string
 }
 
+variable "alb_security_group_id" {
+  description = "Security group ID of the ALB"
+  type        = string
+}
+
 variable "desired_count" {
   description = "Number of tasks to run"
   type        = number
