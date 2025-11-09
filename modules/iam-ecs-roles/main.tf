@@ -15,9 +15,9 @@ resource "aws_iam_role" "ecs_task_execution" {
     }]
   })
 
-  tags = {
+  tags = merge(var.tags, {
     Name = "${var.name}-ecs-exec"
-  }
+  })
 }
 
 # Attach AWS managed policy (required for ECR + CloudWatch Logs)
@@ -43,9 +43,9 @@ resource "aws_iam_role" "ecs_task" {
     }]
   })
 
-  tags = {
+  tags = merge(var.tags, {
     Name = "${var.name}-ecs-task"
-  }
+  })
 }
 
 # Attach additional policies (e.g., S3 read, DynamoDB access)

@@ -14,3 +14,9 @@ variable "trusted_service" {
   type        = string
   default     = "ecs-tasks.amazonaws.com"
 }
+
+variable "tags" {
+  description = "Common tags applied to IAM resources"
+  type        = map(string)
+  default     = {}
+}

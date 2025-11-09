@@ -1,5 +1,9 @@
+###############################
+# ECS Fargate Task Variables  #
+###############################
+
 variable "name" {
-  description = "Base name for ECS resources"
+  description = "Name prefix for all resources (e.g., 'flask-demo')"
   type        = string
 }
 
@@ -9,33 +13,38 @@ variable "cluster_name" {
 }
 
 variable "ecr_image_url" {
-  description = "ECR image URL (with :tag or :latest)"
+  description = "Full ECR image URL with tag (e.g., '123456789.dkr.ecr.us-east-1.amazonaws.com/app:latest')"
   type        = string
 }
 
 variable "container_port" {
-  description = "Port the container listens on"
+  description = "Port the container listens on (must match app and ALB listener)"
   type        = number
-  default     = 80
+  default     = 5000
+
+  validation {
+    condition     = var.container_port >= 80 && var.container_port <= 65535
+    error_message = "Container port must be a valid TCP port (80–65535)."
+  }
 }
 
 variable "task_execution_role_arn" {
-  description = "ARN of the ECS task execution role"
+  description = "ARN of the task execution role (for pulling from ECR)"
   type        = string
 }
 
 variable "task_role_arn" {
-  description = "ARN of the ECS task role"
+  description = "ARN of the task role (for app permissions)"
   type        = string
 }
 
 variable "vpc_id" {
-  description = "VPC ID"
+  description = "ID of the VPC"
   type        = string
 }
 
 variable "subnet_ids" {
-  description = "List of subnet IDs (public for Fargate with public IP)"
+  description = "List of subnet IDs (public for Fargate)"
   type        = list(string)
 }
 
@@ -45,24 +54,35 @@ variable "target_group_arn" {
 }
 
 variable "alb_security_group_id" {
-  description = "Security group ID of the ALB"
+  description = "Security group ID of the ALB (for task SG rules)"
   type        = string
 }
 
 variable "desired_count" {
-  description = "Number of tasks to run"
+  description = "Number of running tasks"
   type        = number
   default     = 1
+
+  validation {
+    condition     = var.desired_count >= 1 && var.desired_count <= 10
+    error_message = "Desired count must be between 1 and 10."
+  }
 }
 
 variable "cpu" {
-  description = "Task CPU (in units)"
-  type        = string
-  default     = "256"
+  description = "vCPU units for the task (e.g., 256 = 0.25 vCPU)"
+  type        = number
+  default     = 256
 }
 
 variable "memory" {
-  description = "Task memory (in MiB)"
-  type        = string
-  default     = "512"
+  description = "Memory in MiB for the task (e.g., 512)"
+  type        = number
+  default     = 512
+}
+
+variable "tags" {
+  description = "Tags to apply to all resources"
+  type        = map(string)
+  default     = {}
 }

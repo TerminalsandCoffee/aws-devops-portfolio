@@ -1,0 +1,16 @@
+# VCS / metadata
+.git
+.github/
+
+# Python artifacts
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+venv/
+env/
+pytest_cache/
+
+# Tests are executed in CI, not baked into the image
+tests/

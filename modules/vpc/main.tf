@@ -11,9 +11,9 @@ resource "aws_vpc" "main" {
   enable_dns_hostnames = true
   enable_dns_support   = true
 
-  tags = {
+  tags = merge(var.tags, {
     Name = var.name
-  }
+  })
 }
 
 # Public subnets
@@ -24,24 +24,24 @@ resource "aws_subnet" "public" {
   availability_zone       = local.azs[count.index]
   map_public_ip_on_launch = true
 
-  tags = {
+  tags = merge(var.tags, {
     Name = "${var.name}-public-${local.azs[count.index]}"
     Tier = "Public"
-  }
+  })
 }
 
 resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.main.id
-  tags = {
+  tags = merge(var.tags, {
     Name = var.name
-  }
+  })
 }
 
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.main.id
-  tags = {
+  tags = merge(var.tags, {
     Name = "${var.name}-public"
-  }
+  })
 }
 
 resource "aws_route" "public_internet" {
@@ -63,36 +63,36 @@ resource "aws_subnet" "private" {
   cidr_block        = cidrsubnet(var.cidr, 8, count.index + var.az_count)
   availability_zone = local.azs[count.index]
 
-  tags = {
+  tags = merge(var.tags, {
     Name = "${var.name}-private-${local.azs[count.index]}"
     Tier = "Private"
-  }
+  })
 }
 
 # NAT Gateway(s)
 resource "aws_eip" "nat" {
   count  = var.enable_nat_gateway ? (var.single_nat_gateway ? 1 : var.az_count) : 0
   domain = "vpc"
-  tags = {
+  tags = merge(var.tags, {
     Name = "${var.name}-nat"
-  }
+  })
 }
 
 resource "aws_nat_gateway" "nat" {
   count         = var.enable_nat_gateway ? (var.single_nat_gateway ? 1 : var.az_count) : 0
   allocation_id = aws_eip.nat[count.index].id
   subnet_id     = aws_subnet.public[count.index % var.az_count].id
-  tags = {
+  tags = merge(var.tags, {
     Name = var.name
-  }
+  })
 }
 
 resource "aws_route_table" "private" {
   count  = var.az_count
   vpc_id = aws_vpc.main.id
-  tags = {
+  tags = merge(var.tags, {
     Name = "${var.name}-private-${local.azs[count.index]}"
-  }
+  })
 }
 
 resource "aws_route" "private_nat" {

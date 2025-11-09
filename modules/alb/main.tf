@@ -7,9 +7,9 @@ resource "aws_lb" "main" {
 
   enable_deletion_protection = false
 
-  tags = {
+  tags = merge(var.tags, {
     Name = var.name
-  }
+  })
 }
 
 # ──────────────────────────────────────────────────────────────
@@ -43,9 +43,9 @@ resource "aws_security_group" "alb" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags = {
+  tags = merge(var.tags, {
     Name = "${var.name}-alb-sg"
-  }
+  })
 }
 
 # ──────────────────────────────────────────────────────────────
@@ -53,7 +53,7 @@ resource "aws_security_group" "alb" {
 # ──────────────────────────────────────────────────────────────
 resource "aws_lb_target_group" "main" {
   name        = var.name
-  port        = 80
+  port        = var.target_group_port
   protocol    = "HTTP"
   vpc_id      = var.vpc_id
   target_type = "ip"
@@ -70,9 +70,9 @@ resource "aws_lb_target_group" "main" {
     unhealthy_threshold = 2
   }
 
-  tags = {
+  tags = merge(var.tags, {
     Name = var.name
-  }
+  })
 }
 
 # ──────────────────────────────────────────────────────────────
