@@ -64,3 +64,19 @@ module "ecs" {
   desired_count           = 1
   tags                    = local.tags
 }
+
+module "cloudwatch_alarms" {
+  source = "../../modules/cloudwatch-alarms"
+
+  cluster_name     = module.ecs.cluster_name
+  service_name     = module.ecs.service_name
+  sns_topic_arn    = aws_sns_topic.alerts.arn
+}
+
+module "ecs_ec2_asg" {
+  source = "../../modules/ecs-ec2-asg"
+
+  name       = local.name
+  vpc_id     = module.vpc.vpc_id
+  subnet_ids = module.vpc.private_subnet_ids
+}

@@ -25,3 +25,11 @@ output "app_url" {
   description = "Full URL to test the deployed application"
   value       = "http://${module.alb.alb_dns_name}"
 }
+
+output "cloudwatch_alarms" {
+  value = module.cloudwatch_alarms.alarm_arns
+}
+
+output "ec2_capacity_provider" {
+  value = module.ecs_ec2_asg.capacity_provider_name
+}
