@@ -9,9 +9,9 @@ resource "aws_ecr_repository" "repo" {
     scan_on_push = var.scan_on_push
   }
 
-  tags = {
+  tags = merge(var.tags, {
     Name = var.name
-  }
+  })
 }
 
 # ──────────────────────────────────────────────────────────────

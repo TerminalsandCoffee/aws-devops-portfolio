@@ -9,9 +9,9 @@ resource "aws_ecs_cluster" "main" {
     value = "enabled"
   }
 
-  tags = {
+  tags = merge(var.tags, {
     Name = var.cluster_name
-  }
+  })
 }
 
 # ──────────────────────────────────────────────────────────────
@@ -21,9 +21,9 @@ resource "aws_cloudwatch_log_group" "ecs" {
   name              = "/ecs/${var.name}"
   retention_in_days = 7
 
-  tags = {
+  tags = merge(var.tags, {
     Name = var.name
-  }
+  })
 }
 
 # ──────────────────────────────────────────────────────────────
@@ -63,9 +63,9 @@ resource "aws_ecs_task_definition" "main" {
     }
   ])
 
-  tags = {
+  tags = merge(var.tags, {
     Name = var.name
-  }
+  })
 }
 
 data "aws_region" "current" {}
@@ -95,9 +95,9 @@ resource "aws_ecs_service" "main" {
   # Optional: Auto-scaling
   # lifecycle { ignore_changes = [desired_count] }
 
-  tags = {
+  tags = merge(var.tags, {
     Name = var.name
-  }
+  })
 }
 
 # ──────────────────────────────────────────────────────────────
@@ -123,7 +123,7 @@ resource "aws_security_group" "ecs_tasks" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags = {
+  tags = merge(var.tags, {
     Name = "${var.name}-ecs-tasks-sg"
-  }
+  })
 }

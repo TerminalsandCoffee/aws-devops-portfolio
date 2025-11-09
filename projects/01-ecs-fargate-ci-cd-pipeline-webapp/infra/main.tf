@@ -14,6 +14,7 @@ module "vpc" {
   az_count           = var.az_count
   enable_nat_gateway = false # Fargate = public subnets only
   single_nat_gateway = true
+  tags               = local.tags
 }
 
 module "alb" {
@@ -23,6 +24,8 @@ module "alb" {
   vpc_id            = module.vpc.vpc_id
   subnet_ids        = module.vpc.public_subnet_ids
   health_check_path = "/"
+  target_group_port = 5000
+  tags              = local.tags
   # certificate_arn = "arn:aws:acm:..."  # optional later
 }
 
@@ -30,6 +33,7 @@ module "iam" {
   source = "../../../modules/iam-ecs-roles"
 
   name = local.name
+  tags = local.tags
   # Example: give task access to S3 bucket
   # additional_task_policy_arns = ["arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"]
 }
@@ -41,6 +45,7 @@ module "ecr" {
   image_tag_mutability = "MUTABLE"
   scan_on_push         = true
   keep_last_n_images   = 10
+  tags                 = local.tags
 }
 
 module "ecs" {
@@ -49,7 +54,7 @@ module "ecs" {
   name                    = local.name
   cluster_name            = "${local.name}-cluster"
   ecr_image_url           = "${module.ecr.repository_url}:latest"
-  container_port          = 80
+  container_port          = 5000
   task_execution_role_arn = module.iam.task_execution_role_arn
   task_role_arn           = module.iam.task_role_arn
   vpc_id                  = module.vpc.vpc_id
@@ -57,4 +62,5 @@ module "ecs" {
   target_group_arn        = module.alb.target_group_arn
   alb_security_group_id   = module.alb.security_group_id
   desired_count           = 1
+  tags                    = local.tags
 }

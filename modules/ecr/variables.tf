@@ -1,26 +1,28 @@
 variable "name" {
-  description = "Name of the ECR repository"
+  description = "ECR repository name"
   type        = string
 }
 
 variable "image_tag_mutability" {
-  description = "MUTABLE or IMMUTABLE"
+  description = "Whether tag mutability is MUTABLE or IMMUTABLE"
   type        = string
   default     = "MUTABLE"
-  validation {
-    condition     = contains(["MUTABLE", "IMMUTABLE"], var.image_tag_mutability)
-    error_message = "image_tag_mutability must be MUTABLE or IMMUTABLE."
-  }
 }
 
 variable "scan_on_push" {
-  description = "Enable image vulnerability scanning"
+  description = "Enable image scan on push"
   type        = bool
   default     = true
 }
 
 variable "keep_last_n_images" {
-  description = "Number of images to retain (0 = keep all)"
+  description = "How many tagged images to keep"
   type        = number
   default     = 10
+}
+
+variable "tags" {
+  description = "Common tags applied to all ECR resources"
+  type        = map(string)
+  default     = {}
 }

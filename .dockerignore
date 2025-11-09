@@ -1,0 +1,52 @@
+# --- VCS / CI metadata ---
+.git
+.github/
+.gitignore
+
+# --- Editors / OS cruft ---
+.vscode/
+.idea/
+.DS_Store
+*.swp
+
+# --- Python noise ---
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.venv/
+venv/
+env/
+.coverage
+htmlcov/
+
+# --- App logs & temp ---
+*.log
+*.tmp
+
+# --- Env / secrets (never bake into image) ---
+.env
+*.env
+
+# --- Terraform (not needed in the runtime image) ---
+*.tf
+*.tfvars
+terraform.tfstate*
+.terraform/
+*.plan
+
+# --- Project-only stuff not needed in the container ---
+scripts/
+docs/
+examples/
+LICENSE
+README.md
+
+# --- Tests (we run them in CI, not inside the image) ---
+tests/
+app/tests/
+
+# --- Docker/local compose files not needed inside image ---
+docker-compose.yml
+docker-compose.*.yml

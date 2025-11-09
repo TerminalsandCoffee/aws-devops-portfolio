@@ -24,3 +24,15 @@ variable "health_check_path" {
   type        = string
   default     = "/"
 }
+
+variable "target_group_port" {
+  description = "Port that the target group uses to route traffic to targets"
+  type        = number
+  default     = 80
+}
+
+variable "tags" {
+  description = "Common tags applied to all ALB resources"
+  type        = map(string)
+  default     = {}
+}
