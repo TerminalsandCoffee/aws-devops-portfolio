@@ -8,16 +8,13 @@ This stack mirrors what real platform teams build for visibility, debugging, and
 
 ## Architecture Summary
 
-• Terraform → VPC, subnets, NAT gateway, route tables
-• Terraform → EKS (managed node groups)
-• Terraform → IRSA for Prometheus/Grafana external integrations
-• Helm → Prometheus
-• Helm → Grafana
-• Kubernetes → demo nginx workload + ServiceMonitor
-• GitHub Actions → CI for Terraform fmt/validate + workflow automation
-
-High-level workflow:
-Developer commit → GitHub Actions CI → Terraform plan → (manual apply) → EKS builds → Helm installs → Prometheus scrapes → Grafana dashboards visualize cluster + workloads.
+- Terraform → VPC, subnets, NAT gateway, route tables
+- Terraform → EKS (managed node groups)
+- Terraform → IRSA for Prometheus/Grafana external integrations
+- Helm → Prometheus
+- Helm → Grafana
+- Kubernetes → demo nginx workload + ServiceMonitor
+- GitHub Actions → CI for Terraform fmt/validate + workflow automation
 
 ## Why This Project Exists
 
@@ -29,8 +26,6 @@ I built this to demonstrate real DevOps engineering skills:
 • Using IRSA instead of long-lived credentials
 • Structuring repos the way platform engineering teams expect
 • Integrating GitHub Actions for validation and automation
-
-If you know how to observe workloads, you know how to operate Kubernetes — and that’s the true skill companies look for.
 
 ## Technologies Used
 
@@ -137,24 +132,24 @@ kubectl apply -f infra/k8s-manifests/
 
 ## How Observability Works
 
-• Prometheus scrapes workloads using ServiceMonitor
-• Grafana dashboards use Prometheus as a data source
-• kube-state-metrics adds cluster-level insights
-• Nginx workload exposes /metrics endpoint for scraping
+- Prometheus scrapes workloads using ServiceMonitor
+- Grafana dashboards use Prometheus as a data source
+- kube-state-metrics adds cluster-level insights
+- Nginx workload exposes /metrics endpoint for scraping
 
 Once deployed, you can:
-• track pod CPU/memory
-• monitor node health
-• visualize nginx request metrics
-• debug deployments
-• follow rollout failures
+- track pod CPU/memory
+- monitor node health
+- visualize nginx request metrics
+- debug deployments
+- follow rollout failures
 
 
 ## Future Enhancements
 
-• Add Loki for logs
-• Add Tempo for tracing
-• Add Karpenter for autoscaling
-• Add GitOps with ArgoCD
-• Add ALB Ingress Controller
-• Add alerting 
+- Add Loki for logs
+- Add Tempo for tracing
+- Add Karpenter for autoscaling
+- Add GitOps with ArgoCD
+- Add ALB Ingress Controller
+- Add alerting 
