@@ -1,4 +1,4 @@
-## **🚀 PROJECT 02 – EKS OBSERVABILITY STACK**
+## **PROJECT 02 – EKS OBSERVABILITY STACK**
 
 ## Overview
 
