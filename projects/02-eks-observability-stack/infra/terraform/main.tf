@@ -1,0 +1,1 @@
+// Root-level glue for the EKS observability stack. Detailed resources live in dedicated *.tf files.
