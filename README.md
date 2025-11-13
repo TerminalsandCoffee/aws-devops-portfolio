@@ -13,7 +13,7 @@ Each project follows the **AWS Well-Architected Framework** and mirrors real-wor
 | # | Project | Core Tools | JD Keywords Hit |
 |---|----------|-------------|-----------------|
 | 01 | **Flask → ECS Fargate + ALB + CloudWatch Alarms** | Terraform, Docker, GitHub Actions, ECR | ECS, ALB, IAM, CloudWatch |
-| 02 | *Coming Soon:* EKS Observability Stack | Terraform, Helm, Prometheus, Grafana | EKS, Observability, Monitoring |
+| 02 | **EKS Observability Stack** | Terraform, Helm, Prometheus, Grafana | EKS, Observability, Monitoring |
 | 03 | *Coming Soon:* DR Automation with Route 53 Failover | Terraform, Lambda, SNS | Route53, DR, Automation |
 
 ---
