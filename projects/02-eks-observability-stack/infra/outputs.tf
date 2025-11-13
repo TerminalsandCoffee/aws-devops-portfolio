@@ -10,5 +10,5 @@ output "cluster_name" {
 
 output "configure_kubectl" {
   description = "Configure kubectl: run this command after deployment"
-  value = "aws eks --region ${var.aws_region} update-kubeconfig --name ${module.eks.cluster_id}"
+  value       = "aws eks --region ${var.aws_region} update-kubeconfig --name ${module.eks.cluster_id}"
 }
