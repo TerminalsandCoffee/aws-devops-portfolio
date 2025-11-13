@@ -8,13 +8,13 @@ This stack mirrors what real platform teams build for visibility, debugging, and
 
 ## Architecture Summary
 
-• Terraform → VPC, subnets, NAT gateway, route tables
-• Terraform → EKS (managed node groups)
-• Terraform → IRSA for Prometheus/Grafana external integrations
-• Helm → Prometheus
-• Helm → Grafana
-• Kubernetes → demo nginx workload + ServiceMonitor
-• GitHub Actions → CI for Terraform fmt/validate + workflow automation
+- Terraform → VPC, subnets, NAT gateway, route tables
+- Terraform → EKS (managed node groups)
+- Terraform → IRSA for Prometheus/Grafana external integrations
+- Helm → Prometheus
+- Helm → Grafana
+- Kubernetes → demo nginx workload + ServiceMonitor
+- GitHub Actions → CI for Terraform fmt/validate + workflow automation
 
 High-level workflow:
 Developer commit → GitHub Actions CI → Terraform plan → (manual apply) → EKS builds → Helm installs → Prometheus scrapes → Grafana dashboards visualize cluster + workloads.
@@ -29,8 +29,6 @@ I built this to demonstrate real DevOps engineering skills:
 • Using IRSA instead of long-lived credentials
 • Structuring repos the way platform engineering teams expect
 • Integrating GitHub Actions for validation and automation
-
-If you know how to observe workloads, you know how to operate Kubernetes — and that’s the true skill companies look for.
 
 ## Technologies Used
 
