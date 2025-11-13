@@ -1,6 +1,6 @@
 # AWS DevOps Portfolio 
 
-> Production-Grade Projects | Terraform | GitHub Actions | ECS / EKS | Observability | Disaster Recovery  
+> Production-Grade Cloud Engineering • Terraform • GitHub Actions • AWS ECS/EKS • Observability • DR & Resilience
 
 This portfolio is a collection of hands-on **AWS DevOps projects** that demonstrate end-to-end automation using Infrastructure as Code (Terraform), CI/CD (GitHub Actions), and containerized workloads (ECS Fargate & EKS).  
 
@@ -12,9 +12,9 @@ Each project follows the **AWS Well-Architected Framework** and mirrors real-wor
 
 | # | Project | Core Tools | JD Keywords Hit |
 |---|----------|-------------|-----------------|
-| 01 | **Flask → ECS Fargate + ALB + CloudWatch Alarms** | Terraform, Docker, GitHub Actions, ECR | ECS, ALB, IAM, CloudWatch |
+| 01 | **Flask Microservice on ECS Fargate** | Terraform, Docker, GitHub Actions, ECR | ECS, ALB, IAM, CloudWatch |
 | 02 | **EKS Observability Stack** | Terraform, Helm, Prometheus, Grafana | EKS, Observability, Monitoring |
-| 03 | *Coming Soon:* DR Automation with Route 53 Failover | Terraform, Lambda, SNS | Route53, DR, Automation |
+| 03 | **GitOps-Powered App on EKS with ArgoCD** | ArgoCD, GitHub Actions, Helm, Terraform | GitOps, CI/CD, Kubernetes Deployments |
 
 ---
 
