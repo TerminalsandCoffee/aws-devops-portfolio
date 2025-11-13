@@ -1,0 +1,70 @@
+# helm/grafana/values.yaml
+# Grafana with pre-built dashboards + secure defaults
+
+grafana:
+  enabled: true
+
+  # Admin password (CHANGE THIS IN PROD!)
+  adminPassword: "admin123holler@ME!"
+
+  # Persistence
+  persistence:
+    enabled: true
+    storageClassName: gp3
+    accessModes: ["ReadWriteOnce"]
+    size: 10Gi
+
+  # Expose via LoadBalancer (for demo)
+  service:
+    type: LoadBalancer
+    port: 80
+
+  # Auto-import EKS + Prometheus dashboards
+  dashboardProviders:
+    dashboardproviders.yaml:
+      apiVersion: 1
+      providers:
+      - name: 'eks'
+        orgId: 1
+        folder: 'EKS'
+        type: file
+        disableDeletion: false
+        editable: true
+        options:
+          path: /var/lib/grafana/dashboards/eks
+
+  dashboards:
+    default:
+      # EKS Cluster Overview (official)
+      eks-cluster:
+        gnetId: 19350
+        revision: 1
+        datasource: Prometheus
+
+      # Node Exporter Full
+      node-exporter:
+        gnetId: 1860
+        revision: 1
+        datasource: Prometheus
+
+      # Kubernetes Pod Overview
+      k8s-pods:
+        gnetId: 6417
+        revision: 1
+        datasource: Prometheus
+
+  # Security: Disable anonymous access
+  security:
+    disable_initial_admin_creation: false
+
+  # Plugins (optional)
+  plugins:
+    - grafana-piechart-panel
+
+  # Extra env vars (e.g., for AWS region)
+  extraEnv:
+    AWS_REGION: "us-west-2"
+
+  # Ingress (optional — for prod with ALB)
+  ingress:
+    enabled: false

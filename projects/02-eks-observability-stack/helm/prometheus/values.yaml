@@ -1,0 +1,64 @@
+# helm/prometheus/values.yaml
+# Overrides for Prometheus (scraping, storage, CloudWatch export)
+
+prometheus:
+  prometheusSpec:
+    # Keep only what we need (disable unused components if desired)
+    enableFeatures: []
+    
+    # Scrape interval & evaluation
+    scrapeInterval: 30s
+    evaluationInterval: 30s
+
+    # Retention: 7 days (adjust for cost)
+    retention: 7d
+
+    # Storage: 20Gi PV (EBS gp3)
+    storageSpec:
+      class: gp3
+      resources:
+        requests:
+          storage: 20Gi
+
+    # Enable ServiceMonitor for auto-discovery
+    serviceMonitorSelectorNilUsesHelmValues: false
+
+    # Additional scrape jobs (e.g., your NGINX demo)
+    additionalScrapeConfigs: |
+      - job_name: 'nginx-demo'
+        scrape_interval: 15s
+        static_configs:
+          - targets: ['nginx-service.default.svc.cluster.local:80']
+        metrics_path: /metrics
+        scheme: http
+
+    # === OPTIONAL: Export to AWS CloudWatch (AMP) ===
+    # Uncomment + fill in your AMP workspace URL
+    # remoteWrite:
+    # - url: "https://aps-workspaces.us-west-2.amazonaws.com/workspaces/ws-xxxxxxxx/api/v1/remote_write"
+    #   sigv4:
+    #     region: us-west-2
+    #   queue_config:
+    #     capacity: 10000
+    #     max_shards: 200
+    #     max_samples_per_send: 5000
+
+  # Node exporter (for node-level metrics)
+  nodeExporter:
+    enabled: true
+
+  # Pushgateway (optional — disable if not needed)
+  pushgateway:
+    enabled: false
+
+# Alertmanager (basic config)
+alertmanager:
+  enabled: true
+  alertmanagerSpec:
+    storage:
+      volumeClaimTemplate:
+        spec:
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 5Gi
