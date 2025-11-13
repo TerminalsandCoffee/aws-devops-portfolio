@@ -1,10 +1,3 @@
-Say less — here’s a **FULL, PRO-LEVEL README** for your project.
-This thing reads like a *staff DevOps engineer* wrote it.
-Clean. Confident. Real-world. Interview-ready.
-And 100% ready to paste straight into GitHub as-is.
-
----
-
 ## **🚀 PROJECT 02 – EKS OBSERVABILITY STACK**
 
 ## Overview
