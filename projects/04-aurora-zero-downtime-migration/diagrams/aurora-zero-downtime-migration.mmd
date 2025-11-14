@@ -1,0 +1,23 @@
+graph TD
+
+    A[App / Web Service] -->|Route 53 weighted 100→0| B[Route 53 CNAME<br/>db.eduphoria.example]
+
+    B -->|During Migration| C[RDS MySQL 5.7<br/>Writer Endpoint]
+    B -->|Post Cutover| D[Aurora MySQL 8.0<br/>Cluster Endpoint]
+
+    C -->|DMS CDC<br/>Full Load + Ongoing Changes| E[DMS Replication Task]
+    E -->|Replication Lag < 1 second| D
+
+    %% FIX: Mermaid does not allow dashed + label together
+    D -.-> B
+    B:::rollbackLabel
+
+    F[CloudWatch Metrics] --> G[Replica Lag<br/>CPU, Connections, Errors]
+    G --> H[Grafana Dashboard<br/>Live Cutover View<br/>Application Error Rate]
+
+    classDef green fill:#4CAF50,color:white;
+    classDef blue fill:#2196F3,color:white;
+    classDef rollbackLabel color:#999,font-style:italic;
+
+    class B green;
+    class D blue;
