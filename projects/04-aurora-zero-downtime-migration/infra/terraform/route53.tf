@@ -1,0 +1,1 @@
+# Route 53 record to act as a blue/green CNAME between RDS and Aurora.

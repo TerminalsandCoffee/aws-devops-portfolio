@@ -1,0 +1,1 @@
+# Root Terraform file – wires modules and resources for RDS → Aurora migration

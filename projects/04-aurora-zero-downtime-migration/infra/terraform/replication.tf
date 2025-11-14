@@ -1,0 +1,1 @@
+# Resources / notes for snapshot & replication config between RDS and Aurora.
