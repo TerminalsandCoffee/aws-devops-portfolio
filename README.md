@@ -10,11 +10,14 @@ Each project follows the **AWS Well-Architected Framework** and mirrors real-wor
 
 ### 📁 Projects Overview  
 
-| # | Project | Core Tools | JD Keywords Hit |
-|---|----------|-------------|-----------------|
-| 01 | **Containerized Flask App on ECS Fargate** | Terraform, Docker, GitHub Actions, ECR | ECS, ALB, IAM, CloudWatch |
-| 02 | **EKS Observability Stack** | Terraform, Helm, Prometheus, Grafana | EKS, Observability, Monitoring |
-| 03 | **GitOps-Powered App on EKS with ArgoCD** | ArgoCD, GitHub Actions, Helm, Terraform | GitOps, CI/CD, Kubernetes Deployments |
+| #  | Project | Core Tools | JD Keywords Hit |
+|----|---------|------------|-----------------|
+| 01 | **Containerized Flask App on ECS Fargate** | Terraform, Docker, GitHub Actions | ECS, Fargate, CI/CD, Containers |
+| 02 | **EKS Observability Stack** | Terraform, Helm, Prometheus, Grafana | EKS, Monitoring, Metrics, Dashboards |
+| 03 | **GitOps-Powered App on EKS with ArgoCD** | ArgoCD, GitHub Actions, Helm | GitOps, Kubernetes, Deployments |
+| 04 | **Aurora Zero-Downtime Migration** | Terraform, DMS, Route 53, CloudWatch | RDS, Aurora, MySQL, Migrations, High Availability |
+
+
 
 ---
 

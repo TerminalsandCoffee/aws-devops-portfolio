@@ -45,7 +45,7 @@ Ensure-File "$projectRoot/architecture.md" @"
 # 3) diagrams/
 $diagramsDir = "$projectRoot/diagrams"
 Ensure-Dir $diagramsDir
-Ensure-File "$diagramsDir/aurora-zero-downtime-migration.drawio"
+Ensure-File "$diagramsDir/aurora-zero-downtime-migration.mmd"
 
 # 4) infra/terraform + envs
 $tfDir = "$projectRoot/infra/terraform"

@@ -47,3 +47,4 @@ Why This Project Matters
 Database migrations show up constantly in interviews for DevOps, Cloud, and Platform Engineering roles. This project demonstrates the ability to manage stateful workloads, plan safe migrations, automate infrastructure, and think about risk the same way production SaaS teams do.
 
 
+![Architecture](diagrams/aurora-zero-downtime-migration.png)
