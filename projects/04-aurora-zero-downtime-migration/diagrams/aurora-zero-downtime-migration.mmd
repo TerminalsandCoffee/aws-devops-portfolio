@@ -1,6 +1,6 @@
 graph TD
 
-    A[App / Web Service] -->|Route 53 weighted 100→0| B[Route 53 CNAME<br/>db.eduphoria.example]
+    A[App / Web Service] -->|Route 53 weighted 100→0| B[Route 53 CNAME<br/>db.TerminalsandCoffee.example]
 
     B -->|During Migration| C[RDS MySQL 5.7<br/>Writer Endpoint]
     B -->|Post Cutover| D[Aurora MySQL 8.0<br/>Cluster Endpoint]

@@ -48,3 +48,7 @@ Database migrations show up constantly in interviews for DevOps, Cloud, and Plat
 
 
 ![Architecture](diagrams/aurora-zero-downtime-migration.png)
+
+<a href="https://github.com/TerminalsandCoffee/aws-devops-portfolio/blob/main/projects/04-aurora-zero-downtime-migration/docs/cutover-demo.gif">
+  <img src="https://github.com/TerminalsandCoffee/aws-devops-portfolio/raw/main/projects/04-aurora-zero-downtime-migration/docs/cutover-demo.gif" width="300" alt="Live Cutover Demo">
+</a>
