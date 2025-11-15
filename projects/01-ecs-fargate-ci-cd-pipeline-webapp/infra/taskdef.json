@@ -1,0 +1,76 @@
+{
+    "taskDefinitionArn": "arn:aws:ecs:us-east-1:397758027793:task-definition/flask-ecs-demo:2",
+    "containerDefinitions": [
+        {
+            "name": "flask-ecs-demo",
+            "image": "397758027793.dkr.ecr.us-east-1.amazonaws.com/flask-ecs-demo:latest",
+            "cpu": 0,
+            "portMappings": [
+                {
+                    "containerPort": 5000,
+                    "hostPort": 5000,
+                    "protocol": "tcp"
+                }
+            ],
+            "essential": true,
+            "environment": [],
+            "mountPoints": [],
+            "volumesFrom": [],
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-group": "/ecs/flask-ecs-demo",
+                    "awslogs-region": "us-east-1",
+                    "awslogs-stream-prefix": "flask-ecs-demo"
+                }
+            },
+            "systemControls": []
+        }
+    ],
+    "family": "flask-ecs-demo",
+    "taskRoleArn": "arn:aws:iam::397758027793:role/flask-ecs-demo-ecs-task",
+    "executionRoleArn": "arn:aws:iam::397758027793:role/flask-ecs-demo-ecs-exec",
+    "networkMode": "awsvpc",
+    "revision": 2,
+    "volumes": [],
+    "status": "ACTIVE",
+    "requiresAttributes": [
+        {
+            "name": "com.amazonaws.ecs.capability.logging-driver.awslogs"
+        },
+        {
+            "name": "ecs.capability.execution-role-awslogs"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.ecr-auth"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.docker-remote-api.1.19"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.task-iam-role"
+        },
+        {
+            "name": "ecs.capability.execution-role-ecr-pull"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.docker-remote-api.1.18"
+        },
+        {
+            "name": "ecs.capability.task-eni"
+        }
+    ],
+    "placementConstraints": [],
+    "compatibilities": [
+        "EC2",
+        "FARGATE",
+        "MANAGED_INSTANCES"
+    ],
+    "requiresCompatibilities": [
+        "FARGATE"
+    ],
+    "cpu": "256",
+    "memory": "512",
+    "registeredAt": "2025-11-14T19:05:40.012000-05:00",
+    "registeredBy": "arn:aws:iam::397758027793:user/raffaello"
+}
