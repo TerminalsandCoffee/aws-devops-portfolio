@@ -7,7 +7,7 @@ locals {
 }
 
 module "vpc" {
-  source = "../../../modules/vpc"
+  source = "../../../../modules/vpc"
 
   name               = local.name
   cidr               = var.vpc_cidr
@@ -18,7 +18,7 @@ module "vpc" {
 }
 
 module "alb" {
-  source = "../../../modules/alb"
+  source = "../../../../modules/alb"
 
   name              = local.name
   vpc_id            = module.vpc.vpc_id
@@ -30,7 +30,7 @@ module "alb" {
 }
 
 module "iam" {
-  source = "../../../modules/iam-ecs-roles"
+  source = "../../../../modules/iam-ecs-roles"
 
   name = local.name
   tags = local.tags
@@ -39,7 +39,7 @@ module "iam" {
 }
 
 module "ecr" {
-  source = "../../../modules/ecr"
+  source = "../../../../modules/ecr"
 
   name                 = local.name
   image_tag_mutability = "MUTABLE"
@@ -49,7 +49,7 @@ module "ecr" {
 }
 
 module "ecs" {
-  source = "../../../modules/ecs-fargate"
+  source = "../../../../modules/ecs-fargate"
 
   name                    = local.name
   cluster_name            = "${local.name}-cluster"
@@ -63,20 +63,4 @@ module "ecs" {
   alb_security_group_id   = module.alb.security_group_id
   desired_count           = 1
   tags                    = local.tags
-}
-
-module "cloudwatch_alarms" {
-  source = "../../modules/cloudwatch-alarms"
-
-  cluster_name     = module.ecs.cluster_name
-  service_name     = module.ecs.service_name
-  sns_topic_arn    = aws_sns_topic.alerts.arn
-}
-
-module "ecs_ec2_asg" {
-  source = "../../modules/ecs-ec2-asg"
-
-  name       = local.name
-  vpc_id     = module.vpc.vpc_id
-  subnet_ids = module.vpc.private_subnet_ids
 }
