@@ -1,17 +1,9 @@
-# ---- Build stage ----
-FROM python:3.12-slim AS builder
-WORKDIR /app
-
-# Copy and install dependencies first for better build caching
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
-# ---- Runtime stage ----
 FROM python:3.12-slim
 WORKDIR /app
 
-# Copy installed Python packages from builder
-COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
+# Install dependencies into runtime image
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy app source
 COPY app.py .
