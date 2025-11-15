@@ -1,0 +1,28 @@
+flowchart LR
+  Dev[Developer] -->|git push| Repo[(GitHub Repo)]
+  Repo --> Actions[GitHub Actions\nCI/CD]
+
+  subgraph Pipeline["Workflow"]
+    Actions --> Build[Build & Push Image]
+    Actions --> Deploy[Terraform + ECS Deploy]
+  end
+
+  Build -->|docker build & push| ECR[(Amazon ECR)]
+  Deploy -->|terraform apply| AWSAccount
+
+  subgraph AWSAccount["AWS Account (us-east-1)"]
+    VPC["VPC 10.10.0.0/16"]
+
+    subgraph Public["Public Subnets"]
+      ALB[Application Load Balancer]
+      ECS["ECS Fargate Service<br/>(flask-ecs-demo)"]
+    end
+
+    Users((Users)) -->|HTTP/HTTPS| ALB
+    ALB --> ECS
+    ECS -->|pull image| ECR
+    ECS --> Logs[CloudWatch Logs]
+  end
+
+  Terraform[Terraform Cloud/CLI] --> Deploy
+
