@@ -36,7 +36,8 @@
 # ===============================
 # Config - override via env vars if needed
 # ===============================
-$Region          = $env:AWS_REGION        ?? "us-east-1"
+# If you're on PS 7+, the ?? operators are fine.
+$Region          = $env:AWS_REGION         ?? "us-east-1"
 $Project         = $env:TF_BACKEND_PROJECT ?? "aws-devops-portfolio"
 $Owner           = $env:TF_BACKEND_OWNER   ?? "rafael-martinez"
 $Environment     = $env:TF_ENV             ?? "global"
