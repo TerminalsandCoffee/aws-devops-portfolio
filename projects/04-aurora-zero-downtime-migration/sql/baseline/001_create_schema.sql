@@ -1,6 +1,6 @@
 -- Base schema for the RDS MySQL source instance
-CREATE DATABASE IF NOT EXISTS eduphoria_demo;
-USE eduphoria_demo;
+CREATE DATABASE IF NOT EXISTS devops_raf_demo;
+USE devops_raf_demo;
 
 CREATE TABLE students (
     id          INT AUTO_INCREMENT PRIMARY KEY,
