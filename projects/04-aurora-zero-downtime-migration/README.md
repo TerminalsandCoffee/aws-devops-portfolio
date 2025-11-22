@@ -26,13 +26,14 @@ What This Demonstrates
 How to Use This Project
 
 1. Deploy the infrastructure using Terraform from the infra/terraform directory.
-2. Apply the baseline schema from sql/baseline to the RDS instance.
-3. Configure replication between RDS and Aurora.
-4. Insert sample data into RDS to observe replication.
-5. Run the replication check script to confirm synchronization.
-6. Use the cutover script to switch the Route 53 CNAME from RDS to Aurora.
-7. Validate application connectivity and read/write operations.
-8. If issues occur, revert using the rollback script.
+2. Apply the baseline schema from `sql/baseline/001_create_schema.sql` to the RDS instance.
+3. Insert seed data using `sql/baseline/002_seed_data.sql` to populate initial records.
+4. Start DMS replication task to begin syncing data to Aurora.
+5. (Optional) Insert additional data using `sql/baseline/003_insert_during_migration.sql` to demonstrate CDC replication in real-time.
+6. Run the replication check script to confirm synchronization and verify data consistency.
+7. Use the cutover script to switch the Route 53 CNAME from RDS to Aurora.
+8. Validate application connectivity and read/write operations on Aurora.
+9. If issues occur, revert using the rollback script.
 
 Repo Structure
 
