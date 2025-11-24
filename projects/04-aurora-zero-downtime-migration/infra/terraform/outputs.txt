@@ -1,0 +1,25 @@
+aurora_connection_string = <sensitive>
+aurora_endpoint = "aurora-migration-dev-aurora-cluster.cluster-czz8x2bnhcfu.us-east-1.rds.amazonaws.com"
+aurora_port = 3306
+aurora_reader_endpoint = "aurora-migration-dev-aurora-cluster.cluster-ro-czz8x2bnhcfu.us-east-1.rds.amazonaws.com"
+aurora_secret_arn = <sensitive>
+aurora_security_group_id = "sg-0c6951adca9d1d33e"
+dms_replication_instance_arn = "arn:aws:dms:us-east-1:397758027793:rep:VN4QRT2B6VAW7ADTEPUM2LD4VI"
+dms_replication_task_arn = "arn:aws:dms:us-east-1:397758027793:task:C6HRQSE6ANEILFHK3S3B7MGERU"
+dms_security_group_id = "sg-0acc38e8cfdf97fd8"
+dms_source_endpoint_arn = "arn:aws:dms:us-east-1:397758027793:endpoint:YVV2LPXCLNFKNFJNWC57NGSWAQ"
+dms_target_endpoint_arn = "arn:aws:dms:us-east-1:397758027793:endpoint:P5UJIWYO7NA4VHR3SFGZD6I7LY"
+private_subnet_ids = [
+  "subnet-0a03f0025ae3d2586",
+  "subnet-0b143acd270d6b834",
+]
+public_subnet_ids = [
+  "subnet-0f32d424ffe30a7f1",
+  "subnet-0a337449daaeabce8",
+]
+rds_connection_string = <sensitive>
+rds_endpoint = "aurora-migration-dev-rds-source.czz8x2bnhcfu.us-east-1.rds.amazonaws.com"
+rds_port = 3306
+rds_secret_arn = <sensitive>
+rds_security_group_id = "sg-0c49459654c5773e7"
+vpc_id = "vpc-03cd08a4493c20b21"

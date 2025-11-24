@@ -50,16 +50,15 @@ resource "aws_db_instance" "source" {
   maintenance_window     = "mon:04:00-mon:05:00"
 
   # Enable binary logging for replication
-  enabled_cloudwatch_logs_exports = ["error", "general", "slow_query"]
+  enabled_cloudwatch_logs_exports = ["error", "general", "slowquery"]
   
   # Enable automated backups
   skip_final_snapshot       = var.environment != "prod"
   final_snapshot_identifier  = "${var.project_name}-rds-final-snapshot-${formatdate("YYYY-MM-DD-hhmm", timestamp())}"
   deletion_protection       = var.environment == "prod"
 
-  # Performance Insights
-  performance_insights_enabled = true
-  performance_insights_retention_period = 7
+  # Performance Insights (not supported on db.t3.micro, enable for larger instances)
+  performance_insights_enabled = false
 
   # Enable binlog for replication
   parameter_group_name = aws_db_parameter_group.rds.name
@@ -76,7 +75,7 @@ resource "aws_db_instance" "source" {
 # RDS Parameter Group (enable binlog)
 resource "aws_db_parameter_group" "rds" {
   name   = "${var.project_name}-rds-params"
-  family = "mysql${replace(var.rds_engine_version, ".", "")}"
+  family = "mysql5.7"
 
   parameter {
     name  = "binlog_format"
@@ -86,11 +85,6 @@ resource "aws_db_parameter_group" "rds" {
   parameter {
     name  = "binlog_checksum"
     value = "NONE"
-  }
-
-  parameter {
-    name  = "log_bin"
-    value = "ON"
   }
 
   tags = merge(

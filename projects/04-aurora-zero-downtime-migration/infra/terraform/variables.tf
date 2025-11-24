@@ -72,13 +72,13 @@ variable "rds_password" {
 variable "aurora_instance_class" {
   type        = string
   description = "Aurora instance class"
-  default     = "db.t3.small"
+  default     = "db.t4g.medium"
 }
 
 variable "aurora_engine_version" {
   type        = string
   description = "Aurora MySQL engine version"
-  default     = "8.0.mysql_aurora.3.05.2"
+  default     = "8.0.mysql_aurora.3.04.0"
 }
 
 variable "aurora_cluster_instances" {

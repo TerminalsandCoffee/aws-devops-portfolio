@@ -43,7 +43,7 @@ resource "aws_rds_cluster" "aurora" {
   preferred_maintenance_window = "mon:04:00-mon:05:00"
 
   # Enable CloudWatch logs
-  enabled_cloudwatch_logs_exports = ["error", "general", "slow_query", "audit"]
+  enabled_cloudwatch_logs_exports = ["error", "general", "slowquery", "audit"]
 
   # Storage encryption
   storage_encrypted = true

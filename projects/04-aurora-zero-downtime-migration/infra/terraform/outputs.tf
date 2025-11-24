@@ -96,6 +96,17 @@ output "dms_security_group_id" {
   value       = aws_security_group.dms.id
 }
 
+# Bastion Outputs
+output "bastion_instance_id" {
+  description = "Bastion instance ID (use with AWS Systems Manager Session Manager)"
+  value       = aws_instance.bastion.id
+}
+
+output "bastion_connect_command" {
+  description = "Command to connect to bastion via Systems Manager"
+  value       = "aws ssm start-session --target ${aws_instance.bastion.id}"
+}
+
 # Connection Strings (for reference)
 output "rds_connection_string" {
   description = "RDS connection string template"

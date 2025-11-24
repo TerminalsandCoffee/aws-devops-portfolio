@@ -149,11 +149,11 @@ resource "aws_security_group" "rds" {
   vpc_id      = aws_vpc.main.id
 
   ingress {
-    description     = "MySQL from Aurora and DMS"
+    description     = "MySQL from DMS"
     from_port       = 3306
     to_port         = 3306
     protocol        = "tcp"
-    security_groups = [aws_security_group.aurora.id, aws_security_group.dms.id]
+    security_groups = [aws_security_group.dms.id]
   }
 
   egress {
@@ -184,14 +184,6 @@ resource "aws_security_group" "aurora" {
     to_port         = 3306
     protocol        = "tcp"
     security_groups = [aws_security_group.dms.id]
-  }
-
-  ingress {
-    description     = "MySQL from RDS (for replication)"
-    from_port       = 3306
-    to_port         = 3306
-    protocol        = "tcp"
-    security_groups = [aws_security_group.rds.id]
   }
 
   egress {

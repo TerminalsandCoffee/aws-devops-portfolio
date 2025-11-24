@@ -1,5 +1,28 @@
 # DMS (Database Migration Service) replication configuration
 
+# IAM Role for DMS VPC access (required by AWS)
+resource "aws_iam_role" "dms_vpc_role" {
+  name = "dms-vpc-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Action = "sts:AssumeRole"
+      Effect = "Allow"
+      Principal = {
+        Service = "dms.amazonaws.com"
+      }
+    }]
+  })
+
+  tags = var.common_tags
+}
+
+resource "aws_iam_role_policy_attachment" "dms_vpc_role" {
+  role       = aws_iam_role.dms_vpc_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonDMSVPCManagementRole"
+}
+
 # DMS Subnet Group
 resource "aws_dms_replication_subnet_group" "main" {
   replication_subnet_group_id          = "${var.project_name}-dms-subnet-group"
@@ -35,6 +58,9 @@ resource "aws_dms_replication_instance" "main" {
 
   # Apply immediately for changes
   apply_immediately = false
+
+  # Use default AWS managed encryption (no KMS key needed)
+  # DMS will use AWS managed encryption by default
 
   tags = merge(
     var.common_tags,
@@ -111,7 +137,9 @@ resource "aws_dms_replication_task" "main" {
     }]
   })
 
-  cdc_start_position = "LATEST"  # Start from current position
+  # cdc_start_position - Empty string for full load + CDC (starts from beginning)
+  # For MySQL, valid formats are: "" (full load + CDC), or specific binlog position
+  cdc_start_position = ""
 
   tags = merge(
     var.common_tags,
