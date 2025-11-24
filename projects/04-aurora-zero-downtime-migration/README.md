@@ -50,9 +50,5 @@ Why This Project Matters
 
 Database migrations show up constantly in interviews for DevOps, Cloud, and Platform Engineering roles. This project demonstrates the ability to manage stateful workloads, plan safe migrations, automate infrastructure, and think about risk the same way production SaaS teams do.
 
+<img width="1142" height="741" alt="image" src="https://github.com/user-attachments/assets/3926867a-dff8-4da7-b5eb-90400b166ff2" />
 
-![Architecture](diagrams/aurora-zero-downtime-migration.png)
-
-<a href="https://github.com/TerminalsandCoffee/aws-devops-portfolio/blob/main/projects/04-aurora-zero-downtime-migration/docs/cutover-demo.gif">
-  <img src="https://github.com/TerminalsandCoffee/aws-devops-portfolio/raw/main/projects/04-aurora-zero-downtime-migration/docs/cutover-demo.gif" width="300" alt="Live Cutover Demo">
-</a>
