@@ -1,27 +1,30 @@
-Project 04 – Aurora Zero-Downtime Migration
+## Project 04 – Aurora Zero-Downtime Migration
 
 This project demonstrates a real-world migration from Amazon RDS MySQL to Amazon Aurora MySQL with near-zero downtime. The goal is to show how to modernize a production database safely, replicate data with minimal lag, and cut over with a reversible, low-risk approach.
 
 The project simulates an environment where an application originally points to a traditional RDS MySQL instance. Using Terraform, Route 53, and replication features, the migration shifts the backend to Aurora without interrupting active workloads. This is the same type of operation SaaS companies perform when moving toward faster failover, better scalability, and reduced operational overhead.
 
-Key Features
+## Key Features
 
-– RDS MySQL source instance provisioned through Terraform
-– Aurora MySQL-compatible cluster deployed with separate instance definitions
-– Replication pipeline using snapshot + binlog style sync behavior
-– Route 53 CNAME record used as a blue/green switch between RDS and Aurora
-– Custom scripts to validate replication health, perform cutover, and support rollback
-– SQL baseline and migration files to simulate realistic DB changes
-– Cutover and rollback runbooks included in the docs directory
+- **Infrastructure as Code**: Both the source RDS MySQL 5.7 instance and the target Aurora MySQL 8.0 cluster are fully defined and deployed using Terraform, ensuring repeatable, version-controlled provisioning.
+- **Independent Aurora instance configuration**: Writer and reader instances use explicit instance classes and parameter groups for realistic production-like setups.
+- **Zero-downtime replication**: Initial full snapshot followed by continuous binlog replication via AWS Database Migration Service (DMS) with Change Data Capture (CDC).
+- **DNS-based cutover**: A Route 53 CNAME record (`db.eduphoria.ex`) acts as the single point of truth; switching traffic from RDS to Aurora requires only an alias update (typically < 30 seconds globally).
+- **Automated validation & orchestration**: Custom scripts validate replication lag, row counts, and checksums before allowing cutover, then execute the DNS flip and post-cutover checks.
+- **Safe rollback capability**: Rollback script instantly repoints the CNAME back to the original RDS endpoint; the source instance remains read-write and fully intact throughout the process.
+- **Realistic workload simulation**: Includes baseline schema, sample data, and representative migration SQL files (schema changes, indexes, data fixes).
+- **Comprehensive runbooks**: Detailed cutover and rollback procedures provided in `/docs`, ready for operational handoff.
 
-What This Demonstrates
+## What This Project Demonstrates
 
-– How to architect and perform a controlled database migration
-– How to minimize downtime using DNS-based switching
-– How to validate replication state before cutover
-– How to design a safe rollback plan in case of issues
-– How to use Terraform for repeatable, version-controlled database infrastructure
-– How to integrate migration procedures into DevOps workflows
+- How to perform a controlled, low-risk database migration from RDS MySQL to Aurora MySQL  
+- Effective use of DNS (Route 53) for near-zero-downtime traffic switching  
+- Rigorous pre-cutover validation of replication health and data consistency  
+- Design and execution of a reversible migration with a guaranteed rollback path  
+- Application of Terraform for consistent, auditable database infrastructure  
+- Integration of migration processes into standard DevOps practices and documentation  
+
+This repository serves as a complete, production-grade reference implementation for Aurora migrations.
 
 How to Use This Project
 
