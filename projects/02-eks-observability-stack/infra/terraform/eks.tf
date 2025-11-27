@@ -1,4 +1,4 @@
-// EKS control plane and node group for observability project.
+// EKS control plane and managed node group sized for the sample app + observability stack.
 
 module "eks" {
   source = "../../../modules/eks"
@@ -16,10 +16,7 @@ module "eks" {
   enable_cluster_public_access  = false
   enable_cluster_private_access = true
 
-  tags = {
-    Environment = "demo"
-    Owner       = "devops-portfolio"
-  }
+  tags = local.common_tags
 
   create_prometheus_policy = true
 }
