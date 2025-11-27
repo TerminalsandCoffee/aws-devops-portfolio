@@ -22,3 +22,13 @@ output "prometheus_policy_arn" {
   description = "ARN of the IAM policy allowing Prometheus to publish metrics to CloudWatch"
   value       = var.create_prometheus_policy ? aws_iam_policy.prometheus_cloudwatch[0].arn : null
 }
+
+output "oidc_provider" {
+  description = "Issuer URL for the cluster's IAM OIDC provider"
+  value       = module.eks_core.oidc_provider
+}
+
+output "oidc_provider_arn" {
+  description = "ARN for the cluster's IAM OIDC provider"
+  value       = module.eks_core.oidc_provider_arn
+}

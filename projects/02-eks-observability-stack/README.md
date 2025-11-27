@@ -1,155 +1,26 @@
-## **PROJECT 02 – EKS OBSERVABILITY STACK**
+# Project 02 – EKS Observability Stack
 
-## Overview
+An Amazon EKS observability + service mesh demo that deploys a small microservices app (frontend + API) with metrics, logs, tracing, and optional mesh sidecars. Terraform builds the cluster and IAM integration points, Helm ships the observability stack and workloads, and GitHub Actions keeps the IaC and charts linted.
 
-This project deploys a fully instrumented **Amazon EKS cluster** with a production-grade **observability stack** built around Prometheus, Grafana, and ServiceMonitor resources. Terraform provisions the AWS infrastructure, Helm handles the observability tools, and Kubernetes manifests demonstrate how applications integrate with the monitoring pipeline.
+## What you get
+- **EKS + Node Groups:** Minimal, production-like cluster with control plane logs enabled and IRSA ready for telemetry components.
+- **Microservices sample app:** Helm chart that deploys a frontend + API pair with resource requests/limits and mesh-aware annotations.
+- **Observability path:** Prometheus + Grafana values, optional OpenTelemetry collector with IAM role for service accounts.
+- **Service mesh ready:** Flip a value to inject sidecars (Istio or AWS App Mesh) and route traffic through Envoy while reusing the same dashboards.
 
-This stack mirrors what real platform teams build for visibility, debugging, and long-term reliability in Kubernetes environments.
+## Tech stack
+- **Cloud/IaC:** Terraform, AWS VPC, Amazon EKS, IAM/IRSA
+- **Platform add-ons:** Prometheus, Grafana, OpenTelemetry Collector (optional)
+- **App delivery:** Helm charts, kubectl
+- **Automation:** GitHub Actions workflow for YAML/Helm/Terraform linting
 
-## Architecture Summary
+## Why it matters for DevOps/Platform roles
+This repo mirrors the paved path a Platform Engineer would hand to application teams: consistent cluster bootstrapping, pre-wired observability, and an easy toggle for mesh-powered traffic management. Everything is documented and scripted so you can demo operational excellence without days of setup.
 
-- Terraform → VPC, subnets, NAT gateway, route tables
-- Terraform → EKS (managed node groups)
-- Terraform → IRSA for Prometheus/Grafana external integrations
-- Helm → Prometheus
-- Helm → Grafana
-- Kubernetes → demo nginx workload + ServiceMonitor
-- GitHub Actions → CI for Terraform fmt/validate + workflow automation
+## Quickstart
+1. **Provision** – `cd infra/terraform && terraform init && terraform apply -auto-approve`
+2. **Configure kubectl** – `aws eks --region <region> update-kubeconfig --name eks-observability-demo`
+3. **Deploy** – `./scripts/deploy.sh` (installs Prometheus/Grafana + the sample frontend/API)
+4. **Explore** – Visit Grafana/Prometheus or wire in a mesh per [`docs/SETUP-STEPS.md`](docs/SETUP-STEPS.md).
 
-## Why This Project Exists
-
-I built this to demonstrate real DevOps engineering skills:
-
-• Provisioning EKS using Terraform modules
-• Setting up cloud-native observability pipelines
-• Implementing ServiceMonitor resources for workload scraping
-• Using IRSA instead of long-lived credentials
-• Structuring repos the way platform engineering teams expect
-• Integrating GitHub Actions for validation and automation
-
-## Technologies Used
-
-**Infrastructure:**
-• AWS VPC
-• Amazon EKS
-• IAM + IRSA
-• NAT Gateway
-• Elastic Load Balancing
-
-**Observability:**
-• Prometheus
-• Grafana
-• kube-state-metrics
-• ServiceMonitor (Prometheus Operator)
-
-**DevOps Tooling:**
-• Terraform (aws + eks + vpc modules)
-• Helm
-• GitHub Actions
-• kubectl
-
-## Repository Structure
-
-```
-02-eks-observability-stack/
-│
-├── README.md
-├── .gitignore
-│
-├── .github/
-│   └── workflows/
-│       └── deploy-eks-observability.yml
-│
-├── docs/
-│   ├── architecture.png
-│   ├── flow.md
-│   └── decisions.md
-│
-├── infra/
-│   ├── vpc.tf
-│   ├── eks.tf
-│   ├── irsa.tf
-│   ├── helm.tf
-│   ├── outputs.tf
-│   ├── providers.tf
-│   ├── variables.tf
-│   ├── versions.tf
-│   ├── .terraform.lock.hcl
-│   │
-│   └── k8s-manifests/
-│       ├── namespaces.yaml
-│       ├── nginx-deployment.yaml
-│       └── nginx-servicemonitor.yaml
-│
-├── charts/
-│   ├── grafana/values.yaml
-│   └── prometheus/values.yaml
-│
-└── scripts/
-    ├── init-eks.sh
-    ├── setup-tf-backend.sh
-    └── cleanup.sh
-```
-
-## Deployment Instructions
-
-### 1. Configure Backend (Optional)
-
-```
-scripts/setup-tf-backend.sh
-```
-
-### 2. Build the Infrastructure
-
-```
-cd infra
-terraform init
-terraform plan
-terraform apply
-```
-
-### 3. Update kubeconfig
-
-```
-scripts/init-eks.sh
-```
-
-### 4. Install Observability Stack
-
-```
-helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
-helm repo add grafana https://grafana.github.io/helm-charts
-
-helm install prometheus prometheus-community/kube-prometheus-stack -f charts/prometheus/values.yaml -n observability
-helm install grafana grafana/grafana -f charts/grafana/values.yaml -n observability
-```
-
-### 5. Deploy Demo Workload
-
-```
-kubectl apply -f infra/k8s-manifests/
-```
-
-## How Observability Works
-
-- Prometheus scrapes workloads using ServiceMonitor
-- Grafana dashboards use Prometheus as a data source
-- kube-state-metrics adds cluster-level insights
-- Nginx workload exposes /metrics endpoint for scraping
-
-Once deployed, you can:
-- track pod CPU/memory
-- monitor node health
-- visualize nginx request metrics
-- debug deployments
-- follow rollout failures
-
-
-## Future Enhancements
-
-- Add Loki for logs
-- Add Tempo for tracing
-- Add Karpenter for autoscaling
-- Add GitOps with ArgoCD
-- Add ALB Ingress Controller
-- Add alerting 
+See [`docs/OVERVIEW.md`](docs/OVERVIEW.md) for architecture context and [`docs/SETUP-STEPS.md`](docs/SETUP-STEPS.md) for full commands.

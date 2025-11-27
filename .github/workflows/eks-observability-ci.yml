@@ -1,0 +1,58 @@
+name: eks-observability-ci
+
+on:
+  pull_request:
+    paths:
+      - 'projects/02-eks-observability-stack/**'
+      - '.github/workflows/eks-observability-ci.yml'
+  push:
+    branches: [ main ]
+    paths:
+      - 'projects/02-eks-observability-stack/**'
+      - '.github/workflows/eks-observability-ci.yml'
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v4
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false
+
+      - name: Lint YAML
+        run: |
+          sudo apt-get update && sudo apt-get install -y yamllint
+          yamllint -d "{extends: default, rules: {line-length: {max: 140}}}" projects/02-eks-observability-stack
+
+      - name: Helm lint sample app chart
+        run: helm lint projects/02-eks-observability-stack/charts/sample-app
+
+      - name: Terraform validate (if Terraform is used)
+        working-directory: projects/02-eks-observability-stack/infra/terraform
+        run: |
+          terraform fmt -check
+          terraform validate
+
+  # deploy:
+  #   needs: lint
+  #   runs-on: ubuntu-latest
+  #   permissions:
+  #     id-token: write
+  #     contents: read
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - name: Configure AWS credentials via OIDC
+  #       uses: aws-actions/configure-aws-credentials@v4
+  #       with:
+  #         role-to-assume: arn:aws:iam::123456789012:role/github-oidc-eks-deployer
+  #         aws-region: us-west-2
+  #     - name: Deploy manifests and charts
+  #       run: |
+  #         aws eks update-kubeconfig --region us-west-2 --name eks-observability-demo
+  #         helm upgrade --install sample-app projects/02-eks-observability-stack/charts/sample-app -n demo --create-namespace

@@ -20,6 +20,7 @@ module "eks_core" {
   cluster_enabled_log_types       = var.control_plane_log_types
   cluster_endpoint_public_access  = var.enable_cluster_public_access
   cluster_endpoint_private_access = var.enable_cluster_private_access
+  enable_irsa                     = true
 
   eks_managed_node_groups = {
     default = {
