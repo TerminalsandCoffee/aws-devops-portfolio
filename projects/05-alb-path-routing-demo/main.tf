@@ -154,12 +154,43 @@ resource "aws_security_group" "instances" {
   })
 }
 
+resource "aws_iam_role" "ssm_role" {
+  name = "${var.project_name}-ssm-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        }
+      }
+    ]
+  })
+
+  tags = local.common_tags
+}
+
+resource "aws_iam_role_policy_attachment" "ssm_core" {
+  role       = aws_iam_role.ssm_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
+
+resource "aws_iam_instance_profile" "ssm_profile" {
+  name = "${var.project_name}-ssm-profile"
+  role = aws_iam_role.ssm_role.name
+  tags = local.common_tags
+}
+
 resource "aws_instance" "linux_app1" {
   ami                    = data.aws_ami.linux.id
   instance_type          = var.linux_instance_type
   subnet_id              = aws_subnet.public[0].id
   vpc_security_group_ids = [aws_security_group.instances.id]
   user_data              = local.linux_user_data
+  iam_instance_profile   = aws_iam_instance_profile.ssm_profile.name
   associate_public_ip_address = true
 
   tags = merge(local.common_tags, {
@@ -173,6 +204,7 @@ resource "aws_instance" "windows_app2" {
   subnet_id              = aws_subnet.public[1].id
   vpc_security_group_ids = [aws_security_group.instances.id]
   user_data_base64       = base64encode(local.windows_user_data)
+  iam_instance_profile   = aws_iam_instance_profile.ssm_profile.name
   associate_public_ip_address = true
 
   tags = merge(local.common_tags, {
@@ -223,8 +255,8 @@ resource "aws_lb_target_group" "app2" {
     matcher             = "200"
     healthy_threshold   = 2
     unhealthy_threshold = 2
-    interval            = 30
-    timeout             = 5
+    interval            = 60
+    timeout             = 10
   }
 
   tags = merge(local.common_tags, {
