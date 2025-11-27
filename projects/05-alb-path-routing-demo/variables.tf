@@ -25,8 +25,8 @@ variable "vpc_cidr" {
 
 variable "availability_zones" {
   type        = list(string)
-  description = "Availability zones for subnets"
-  default     = ["us-east-1a", "us-east-1b"]
+  description = "Optional override for availability zones; leave empty to use the first two available"
+  default     = []
 }
 
 # EC2 Key Pair

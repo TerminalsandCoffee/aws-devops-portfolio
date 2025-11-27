@@ -1,3 +1,10 @@
+##############################################
+# ALB Path Routing Demo
+# - Routes /app1/ to Amazon Linux 2023 + Nginx
+# - Routes /app2/ to Windows Server 2022 + IIS
+# Test URLs after apply: http://<alb_dns>/app1/ and http://<alb_dns>/app2/
+##############################################
+
 # ALB Path Routing Demo - Main Terraform Configuration
 
 terraform {
@@ -18,6 +25,11 @@ provider "aws" {
 # Data source for availability zones
 data "aws_availability_zones" "available" {
   state = "available"
+}
+
+# Preferred availability zones (fall back to the first two available)
+locals {
+  availability_zones = length(var.availability_zones) > 0 ? var.availability_zones : slice(data.aws_availability_zones.available.names, 0, 2)
 }
 
 # Data source for Windows Server 2022 AMI
@@ -80,10 +92,10 @@ resource "aws_internet_gateway" "main" {
 
 # Public Subnets (for ALB and EC2 instances)
 resource "aws_subnet" "public" {
-  count             = length(var.availability_zones)
+  count             = length(local.availability_zones)
   vpc_id            = aws_vpc.main.id
   cidr_block        = cidrsubnet(var.vpc_cidr, 8, count.index)
-  availability_zone = var.availability_zones[count.index]
+  availability_zone = local.availability_zones[count.index]
 
   map_public_ip_on_launch = true
 
@@ -115,7 +127,7 @@ resource "aws_route_table" "public" {
 
 # Route Table Associations
 resource "aws_route_table_association" "public" {
-  count          = length(var.availability_zones)
+  count          = length(local.availability_zones)
   subnet_id      = aws_subnet.public[count.index].id
   route_table_id = aws_route_table.public.id
 }
@@ -295,9 +307,13 @@ locals {
     server {
         listen 80;
         server_name _;
-        
-        location /app1 {
-            alias /usr/share/nginx/html/app1;
+
+        location = /app1 {
+            return 301 /app1/;
+        }
+
+        location /app1/ {
+            alias /usr/share/nginx/html/app1/;
             index index.html;
             try_files $uri $uri/ /app1/index.html;
         }
