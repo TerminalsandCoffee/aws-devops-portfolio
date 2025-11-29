@@ -13,6 +13,8 @@ This project demonstrates Application Load Balancer (ALB) path-based routing, se
   - `/app1*` → Linux/Nginx target group
   - `/app2*` → Windows/IIS target group
   - Default → Friendly 404 page
+    
+![alb_architecture_diagram_v2_1764345466132](https://github.com/user-attachments/assets/d0168161-b727-4cbc-b1a8-0827af2a70f0)
 
 ## Key Features
 
