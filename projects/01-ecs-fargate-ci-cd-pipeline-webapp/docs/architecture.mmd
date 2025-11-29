@@ -1,28 +1,48 @@
-flowchart LR
-  Dev[Developer] -->|git push| Repo[(GitHub Repo)]
-  Repo --> Actions[GitHub Actions\nCI/CD]
-
-  subgraph Pipeline["Workflow"]
-    Actions --> Build[Build & Push Image]
-    Actions --> Deploy[Terraform + ECS Deploy]
-  end
-
-  Build -->|docker build & push| ECR[(Amazon ECR)]
-  Deploy -->|terraform apply| AWSAccount
-
-  subgraph AWSAccount["AWS Account (us-east-1)"]
-    VPC["VPC 10.10.0.0/16"]
-
-    subgraph Public["Public Subnets"]
-      ALB[Application Load Balancer]
-      ECS["ECS Fargate Service<br/>(flask-ecs-demo)"]
+flowchart TB
+    subgraph CI_CD ["CI/CD Pipeline (GitHub Actions)"]
+        direction TB
+        Code[Developer Push] -->|Triggers| Workflow
+        subgraph Workflow ["Build & Deploy Workflow"]
+            Build[Build Docker Image]
+            Push[Push to ECR]
+            IaC[Terraform Apply]
+        end
+        Build --> Push
+        Push --> IaC
     end
 
-    Users((Users)) -->|HTTP/HTTPS| ALB
-    ALB --> ECS
-    ECS -->|pull image| ECR
-    ECS --> Logs[CloudWatch Logs]
-  end
+    subgraph AWS ["AWS Cloud (us-east-1)"]
+        style AWS fill:#f9f9f9,stroke:#333,stroke-width:2px
+        
+        subgraph VPC ["VPC (10.10.0.0/16)"]
+            style VPC fill:#e1f5fe,stroke:#0277bd,stroke-width:2px
+            
+            subgraph Public_Subnets ["Public Subnets (Multi-AZ)"]
+                style Public_Subnets fill:#e0f2f1,stroke:#00695c,stroke-dasharray: 5 5
+                
+                ALB[Application Load Balancer]
+                style ALB fill:#ff9800,stroke:#e65100,color:white
+                
+                ECS_Service["ECS Fargate Service\n(flask-ecs-demo)"]
+                style ECS_Service fill:#4caf50,stroke:#1b5e20,color:white
+            end
+        end
+        
+        ECR[Amazon ECR]
+        style ECR fill:#9c27b0,stroke:#4a148c,color:white
+        
+        CloudWatch[CloudWatch Logs]
+        style CloudWatch fill:#607d8b,stroke:#263238,color:white
+    end
 
-  Terraform[Terraform Cloud/CLI] --> Deploy
-
+    %% Data Flow
+    User((Users)) -->|HTTP/80| ALB
+    ALB -->|Traffic :5000| ECS_Service
+    
+    %% CI/CD Integrations
+    Push -.->|Images| ECR
+    IaC -.->|Manage| AWS
+    
+    %% Service Integrations
+    ECS_Service -->|Pull Image| ECR
+    ECS_Service -.->|Logs| CloudWatch
