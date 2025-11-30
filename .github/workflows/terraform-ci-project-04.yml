@@ -1,0 +1,19 @@
+name: terraform-ci-project-04
+
+on:
+  pull_request:
+    paths:
+      - "projects/04-aurora-zero-downtime-migration/infra/terraform/**"
+      - ".github/workflows/reusable-terraform-ci.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "projects/04-aurora-zero-downtime-migration/infra/terraform/**"
+      - ".github/workflows/reusable-terraform-ci.yml"
+
+jobs:
+  ci:
+    uses: ./.github/workflows/reusable-terraform-ci.yml
+    with:
+      working-directory: ./projects/04-aurora-zero-downtime-migration/infra/terraform
