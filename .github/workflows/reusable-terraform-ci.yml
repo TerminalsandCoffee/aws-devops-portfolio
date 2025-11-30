@@ -47,3 +47,5 @@ jobs:
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: tfsec.sarif
+
+# This is the "brain" for theecs-fargate pipeline and tf-ci.yml rely on. If you delete this, the others break.
