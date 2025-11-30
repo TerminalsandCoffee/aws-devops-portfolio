@@ -2,5 +2,5 @@ apiVersion: v2
 name: sample-app
 version: 0.1.0
 appVersion: "1.0.0"
-description: "Demo microservices app (frontend + api) used in the EKS observability stack"
+description: "Raf's demo microservices app (frontend + api) used in the EKS observability stack"
 type: application
