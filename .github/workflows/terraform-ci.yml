@@ -17,3 +17,5 @@ jobs:
     uses: ./.github/workflows/reusable-terraform-ci.yml
     with:
       working-directory: ./projects/01-ecs-fargate-ci-cd-pipeline-webapp/infra/terraform
+
+# This triggers the infrastructure checks for Project 01 on every Pull Request.
