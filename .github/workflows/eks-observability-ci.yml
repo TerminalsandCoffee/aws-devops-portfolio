@@ -5,11 +5,11 @@ on:
     paths:
       - 'projects/02-eks-observability-stack/**'
       - '.github/workflows/eks-observability-ci.yml'
-  push:
-    branches: [ main ]
-    paths:
-      - 'projects/02-eks-observability-stack/**'
-      - '.github/workflows/eks-observability-ci.yml'
+ # push:
+  # branches: [ main ]
+    # paths:
+     # - 'projects/02-eks-observability-stack/**'
+     # - '.github/workflows/eks-observability-ci.yml'
 
 jobs:
   lint:

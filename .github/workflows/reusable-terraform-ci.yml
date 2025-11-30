@@ -48,4 +48,31 @@ jobs:
         with:
           sarif_file: tfsec.sarif
 
+      # tflint for additional checks other than tfsec
+      - name: Run tflint
+        uses: terraform-linters/tflint-action@v2
+        with:
+          working_directory: ${{ inputs.working-directory }}
+          args: "--recursive"
+
+      # Checkov (catches different classes of issues than tfsec)
+      - name: Run Checkov
+        uses: bridgecrewio/checkov-action@v12
+        with:
+          directory: ${{ inputs.working-directory }}
+          output_format: sarif
+          output_file_path: checkov.sarif
+
+      - name: Upload Checkov SARIF
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: checkov.sarif
+
+      # Cache .terraform directory across runs — huge time saver
+      - name: Cache Terraform
+        uses: actions/cache@v4
+        with:
+          path: ${{ inputs.working-directory }}/.terraform
+    key: ${{ runner.os }}-terraform-${{ hashFiles('**/.terraform.lock.hcl') }}
+
 # This is the "brain" for theecs-fargate pipeline and tf-ci.yml rely on. If you delete this, the others break.
