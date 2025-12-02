@@ -40,4 +40,3 @@ terraform init && terraform apply -auto-approve
 ./scripts/trigger-failure.sh
 # → 5xx errors + CloudWatch alarm + EventBridge rule + Lambda triggered
 
-# → 5xx errors + CloudWatch alarm + EventBridge rule + Lambda triggered
