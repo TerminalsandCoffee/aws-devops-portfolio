@@ -16,6 +16,8 @@ Each project follows the **AWS Well-Architected Framework** and mirrors real-wor
 | 02 | **EKS Observability Stack** | Terraform, Helm, Prometheus, Grafana | EKS, Monitoring, Metrics, Dashboards |
 | 03 | **GitOps-Powered App on EKS with ArgoCD** | ArgoCD, GitHub Actions, Helm | GitOps, Kubernetes, Deployments |
 | 04 | **Aurora Zero-Downtime Migration** | Terraform, DMS, Route 53, CloudWatch | RDS, Aurora, MySQL, Migrations, High Availability |
+| 05 | **ALB Path-Based Routing Demo** | Terraform, ALB, EC2 (Linux/Windows) | Load Balancing, Multi-Platform, Path Routing |
+| 06 | **ECS Stale Route Auto-Healer** | Lambda, EventBridge, CloudWatch Alarms | Automation, Self-Healing, Event-Driven |
 
 
 
@@ -23,11 +25,12 @@ Each project follows the **AWS Well-Architected Framework** and mirrors real-wor
 
 ### Portfolio Highlights  
 - **IaC:** 100% Terraform — modular, reusable, and environment-scoped  
-- **CI/CD:** Automated via GitHub Actions (plan/apply workflows)  
-- **Containers:** ECS Fargate workloads with ECR-based image builds  
+- **CI/CD:** Automated via GitHub Actions with reusable workflows for consistency across projects  
+- **Security:** Shift-left security with `tfsec` scanning, scoped IAM roles, encrypted resources, and least privilege  
+- **Containers:** ECS Fargate workloads with ECR-based image builds and automated deployments  
 - **Observability:** CloudWatch logs, alarms, and dashboards integrated  
-- **Security:** Scoped IAM roles, encrypted resources, least privilege  
-- **Remote State:** S3 backend + DynamoDB locking (no local drift)  
+- **Remote State:** S3 backend + DynamoDB locking for team collaboration (no local drift)  
+- **Runbooks:** Production-ready operational runbooks for critical migrations and cutover procedures  
 
 ---
 

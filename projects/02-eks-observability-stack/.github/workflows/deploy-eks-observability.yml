@@ -1,10 +1,11 @@
-name: Deploy EKS Observability
+#name: Deploy EKS Observability
+# Disabling until project is built out. 
 
-on:
-  push:
-    branches: [ main ]
-    paths: [ 'projects/02-eks-observability-stack/**' ]
-  pull_request:
+#on:
+#  push:
+#    branches: [ main ]
+#    paths: [ 'projects/02-eks-observability-stack/**' ]
+#  pull_request:
 
 jobs:
   deploy:
@@ -19,8 +20,8 @@ jobs:
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v4
       with:
-        role-to-assume: arn:aws:iam::YOUR-ACCOUNT:role/GitHubActionsRole  # Create OIDC role
-        aws-region: us-west-2
+        role-to-assume: arn:aws:iam::397758027793:role/GitHubActionsRole  # Create OIDC role
+        aws-region: us-east-1
 
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v3
@@ -45,7 +46,7 @@ jobs:
         curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 
     - name: Update kubeconfig
-      run: aws eks update-kubeconfig --region us-west-2 --name eks-observability-demo
+      run: aws eks update-kubeconfig --region us-east-1 --name eks-observability-demo
 
     - name: Helm Upgrade
       if: github.ref == 'refs/heads/main'
