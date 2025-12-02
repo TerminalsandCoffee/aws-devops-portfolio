@@ -1,21 +1,20 @@
-```mermaid
 flowchart TD
     %% Nodes
-    A[Application Load Balancer\n(ALB)] --> B[Target Group\n(demo-tg)]
-    B -->|502/504/500 traffic| C[Unhealthy ECS Task\n(nginx killed)]
-    B --> D[CloudWatch Metric\nHTTPCode_Target_5XX_Count]
+    A["Application Load Balancer\n(ALB)"] --> B["Target Group\n(demo-tg)"]
+    B -->|"502/504/500 traffic"| C["Unhealthy ECS Task\n(nginx killed)"]
+    B --> D["CloudWatch Metric\nHTTPCode_Target_5XX_Count"]
     
-    D -->|≥1 in 1 minute| E[CloudWatch Alarm\n5xx-auto-healer-alarm]
-    E -->|State = ALARM| F[EventBridge Rule\nCatch-5xx-Alarm]
+    D -->|"≥1 in 1 minute"| E["CloudWatch Alarm\n5xx-auto-healer-alarm"]
+    E -->|"State = ALARM"| F["EventBridge Rule\nCatch-5xx-Alarm"]
 
-    F --> G[Lambda Function\nAutoHealer-RestartRegistrator]
-    G -->|1. Verify unhealthy targets| H[elbv2:DescribeTargetHealth]
-    H -->|2. Resolve EC2 instance ID| I[ECS DescribeTasks → EC2 Instance]
+    F --> G["Lambda Function\nAutoHealer-RestartRegistrator"]
+    G -->|"1. Verify unhealthy targets"| H["elbv2:DescribeTargetHealth"]
+    H -->|"2. Resolve EC2 instance ID"| I["ECS DescribeTasks → EC2 Instance"]
     
-    G -->|3. SSM RunCommand| J[AWS-RunShellScript\nsystemctl restart registrator]
-    J --> K[EC2 Container Instance\n(registrator restarts)]
-    K -->|Task re-registers| C
-    C -->|Health checks pass| B
+    G -->|"3. SSM RunCommand"| J["AWS-RunShellScript\nsystemctl restart registrator"]
+    J --> K["EC2 Container Instance\n(registrator restarts)"]
+    K -->|"Task re-registers"| C
+    C -->|"Health checks pass"| B
 
     style E fill:#ff4d4d,color:white
     style G fill:#1a6ecc,color:white

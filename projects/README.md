@@ -8,7 +8,7 @@ Reduced MTTR from **10+ minutes → <60 seconds** for a recurring 5xx issue caus
 - Manual fix: CloudWatch → find task → find host → SSH → Troubleshoot (10+ mins)
 
 ## The Solution I Built
-![Architecture diagram](./diagram.png)
+![Architecture diagram](./diagram.mmd)
 
 - CloudWatch alarm on `HTTPCode_Target_5XX_Count`
 - EventBridge rule → Python Lambda
