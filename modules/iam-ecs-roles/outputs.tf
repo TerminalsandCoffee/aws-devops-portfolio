@@ -13,3 +13,7 @@ output "task_execution_role_name" {
 output "task_role_name" {
   value = aws_iam_role.ecs_task.name
 }
+
+output "execution_role_arn" {
+  value = aws_iam_role.ecs_task_execution.arn
+}

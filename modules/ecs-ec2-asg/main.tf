@@ -1,3 +1,13 @@
+data "aws_ami" "amazon_linux" {
+  most_recent = true
+  owners      = ["amazon"]
+
+  filter {
+    name   = "name"
+    values = ["amzn2-ami-ecs-hvm-*-x86_64-ebs"]
+  }
+}
+
 resource "aws_launch_template" "this" {
   name_prefix   = "${var.name}-"
   image_id      = data.aws_ami.amazon_linux.id
