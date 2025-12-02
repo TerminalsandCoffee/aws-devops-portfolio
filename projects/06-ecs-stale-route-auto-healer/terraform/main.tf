@@ -171,13 +171,30 @@ resource "aws_iam_role_policy" "lambda_policy" {
       {
         Effect = "Allow"
         Action = [
-          "ecs:ListTasks",
-          "ecs:DescribeTasks",
-          "ecs:StopTask",
-          "ecs:UpdateService",
           "logs:CreateLogGroup",
           "logs:CreateLogStream",
           "logs:PutLogEvents"
+        ]
+        Resource = "*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "ecs:ListTasks",
+          "ecs:DescribeTasks",
+          "ecs:StopTask",
+          "ecs:UpdateService"
+        ]
+        Resource = [
+          aws_ecs_cluster.main.arn,
+          aws_ecs_service.nginx.id,
+          "arn:aws:ecs:${var.region}:${data.aws_caller_identity.current.account_id}:task/${aws_ecs_cluster.main.name}/*"
+        ]
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "elasticloadbalancing:DescribeTargetHealth"
         ]
         Resource = "*"
       }
@@ -189,21 +206,19 @@ resource "aws_iam_role_policy" "lambda_policy" {
 resource "aws_cloudwatch_metric_alarm" "http_5xx" {
   alarm_name          = "${var.cluster_name}-high-5xx"
   comparison_operator = "GreaterThanThreshold"
-  evaluation_periods  = "1"
+  evaluation_periods  = "2"
   metric_name         = "HTTPCode_Target_5XX_Count"
   namespace           = "AWS/ApplicationELB"
   period              = "60"
   statistic           = "Sum"
-  threshold           = "0" # Trigger on ANY 5xx error
+  threshold           = "5" # Trigger on >5 errors to prevent flapping
   alarm_description   = "Triggers when ALB sees 5xx errors"
   treat_missing_data  = "notBreaching"
 
   dimensions = {
-    LoadBalancer = module.alb.alb_arn # Note: Dimensions might need specific format, usually just ARN suffix or Name. 
-    # Actually for ALB metrics, it's usually "LoadBalancer" = "app/my-load-balancer/50dc6c495c0c9188"
-    # module.alb.alb_arn is the full ARN. We need to extract the ID part if using "LoadBalancer" dimension.
-    # However, usually just the ARN works if the provider handles it, or we use the specific resource.
-    # Let's use the ARN suffix which is safer.
+    # Extract the ARN suffix for the LoadBalancer dimension
+    # Format: app/load-balancer-name/load-balancer-id
+    LoadBalancer = replace(module.alb.alb_arn, "/^arn:.*:loadbalancer\\/(.*)$/", "$1")
   }
 }
 
