@@ -1,4 +1,4 @@
-# ECS Stale-Route Auto-Healer ← Real Production Incident Fix
+# ECS Stale-Route Auto-Healer 
 
 Reduced MTTR from **10+ minutes → <60 seconds** for a recurring 5xx issue caused by stale service-discovery state.
 
@@ -8,7 +8,6 @@ Reduced MTTR from **10+ minutes → <60 seconds** for a recurring 5xx issue caus
 - Manual fix: CloudWatch → find task → find host → SSH → Troubleshoot (10+ mins)
 
 ## The Solution I Built
-![Architecture diagram](./diagram.mmd)
 
 - CloudWatch alarm on `HTTPCode_Target_5XX_Count`
 - EventBridge rule → Python Lambda
