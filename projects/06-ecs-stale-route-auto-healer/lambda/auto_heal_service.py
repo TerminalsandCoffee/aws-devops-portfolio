@@ -1,98 +1,71 @@
 import boto3
-import json
+import os
 import logging
-from botocore.exceptions import ClientError
 
+ecs = boto3.client('ecs')
+elbv2 = boto3.client('elbv2')
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-ssm      = boto3.client('ssm')
-ecs      = boto3.client('ecs')
-elbv2    = boto3.client('elbv2')
-ec2      = boto3.client('ec2')
-cloudwatch = boto3.client('cloudwatch')
+CLUSTER_NAME = os.environ.get('CLUSTER_NAME') # Retrieved from Terraform env var
 
 def lambda_handler(event, context):
-    logger.info(f"EventBridge event: {json.dumps(event)}")
-
-    # 1. Parse the CloudWatch alarm that EventBridge forwarded
-    alarm_name = event['detail']['alarmName']
+    # 1. Get TargetGroup ARN from Alarm
+    # (Note: Alarm dimension parsing logic remains the same)
     tg_arn = event['detail']['configuration']['metrics'][0]['metricStat']['metric']['dimensions']['TargetGroup']
-    logger.info(f"Triggered by alarm '{alarm_name}' for TargetGroup {tg_arn}")
-
-    # 2. THE "VERIFY" PHASE — double-check there really are unhealthy targets
+    
+    # 2. Find unhealthy targets
     health = elbv2.describe_target_health(TargetGroupArn=tg_arn)
     unhealthy_targets = [
         t for t in health['TargetHealthDescriptions']
-        if t['TargetHealth']['State'] in ('unhealthy', 'draining')
-           and t['TargetHealth'].get('Reason') in ('Target.FailedHealthChecks', 'Target.Deregistered')
+        if t['TargetHealth']['State'] in ['unhealthy', 'draining']
     ]
 
     if not unhealthy_targets:
-        logger.info("Verification passed: no unhealthy targets found — nothing to do")
-        return {'statusCode': 200, 'body': 'No unhealthy targets — exiting'}
+        return {"status": "No unhealthy targets found."}
 
-    logger.warning(f"Verification failed: {len(unhealthy_targets)} unhealthy targets detected")
+    # 3. List all tasks in the cluster (Use pagination in real prod code!)
+    # Optimization: Use 'containerInstance' filter if you knew the host, 
+    # but for Fargate/mixed, listing tasks is safer.
+    list_resp = ecs.list_tasks(cluster=CLUSTER_NAME, desiredStatus='RUNNING')
+    task_arns = list_resp['taskArns']
+    
+    if not task_arns:
+        return {"status": "No running tasks found."}
 
-    # 3. Resolve unhealthy tasks → container instances → EC2 instance IDs
-    instance_ids = set()
-
-    # Get all running tasks in the cluster (you can make cluster name dynamic or pass via alarm tags)
-    cluster_name = 'production-ecs-cluster'  # or extract from alarm tags in real life
-    tasks = ecs.list_tasks(cluster=cluster_name, desiredStatus='RUNNING')['taskArns']
-
-    task_details = ecs.describe_tasks(cluster=cluster_name, tasks=tasks)['tasks']
-
-    for target in unhealthy_targets:
-        target_ip   = target['Target']['Id']      # this is the task private IP
-        target_port = target['Target']['Port']
-
-        for task in task_details:
+    # 4. Describe tasks to get their network details (IPs)
+    # AWS allows describing up to 100 tasks at once.
+    tasks_resp = ecs.describe_tasks(cluster=CLUSTER_NAME, tasks=task_arns)
+    
+    # 5. Match Target IP to Task
+    tasks_to_kill = []
+    
+    for u_target in unhealthy_targets:
+        bad_ip = u_target['Target']['Id']
+        bad_port = u_target['Target']['Port']
+        
+        for task in tasks_resp['tasks']:
+            # Look inside containers for network bindings
             for container in task['containers']:
-                if any(net['networkInterfaceId'] for net in container.get('networkInterfaces', [])):
-                    # Very fast approximate match — in prod I used exact IP+port lookup via ENI tags
-                    for attachment in task['attachments']:
-                        if attachment['type'] == 'ElasticNetworkInterface':
-                            eni_id = next((d['value'] for d in attachment['details']
-                                          if d['name'] == 'networkInterfaceId'), None)
-                            if eni_id:
-                                eni = ec2.describe_network_interfaces(NetworkInterfaceIds=[eni_id])['NetworkInterfaces'][0]
-                                if eni.get('PrivateIpAddress') == target_ip:
-                                    instance_ids.add(eni['Attachment']['InstanceId'])
+                # For 'awsvpc' mode (Fargate), IP is in networkInterfaces
+                # For 'bridge' mode (EC2), we look at mapped ports
+                # Let's assume standard logic:
+                for net_int in task['attachments']:
+                    if net_int['type'] == 'ElasticNetworkInterface':
+                        for detail in net_int['details']:
+                            if detail['name'] == 'privateIPv4Address' and detail['value'] == bad_ip:
+                                tasks_to_kill.append(task['taskArn'])
+    
+    # 6. Execute the Fix (Stop the Task)
+    # Removing duplicates
+    tasks_to_kill = list(set(tasks_to_kill))
+    
+    for task_arn in tasks_to_kill:
+        logger.info(f"Stopping stale task: {task_arn}")
+        ecs.stop_task(
+            cluster=CLUSTER_NAME,
+            task=task_arn,
+            reason='Auto-Healer: Task failed ALB health checks'
+        )
 
-    if not instance_ids:
-        logger.error("Could not map unhealthy targets to EC2 instances")
-        return {'statusCode': 500, 'body': 'Failed to resolve instance IDs'}
-
-    # 4. THE "PROTECT" PHASE — surgical restart of registrator only on affected hosts
-    service_name = "registrator"
-    restart_cmd = f"sudo systemctl restart {service_name} || sudo service {service_name} restart"
-
-    for instance_id in instance_ids:
-        try:
-            logger.info(f"Remediating affected host {instance_id}")
-            response = ssm.send_command(
-                InstanceIds=[instance_id],
-                DocumentName="AWS-RunShellScript",
-                TimeoutSeconds=180,
-                Parameters={
-                    'commands': [
-                        restart_cmd,
-                        f"echo '[$(date)] Auto-Healer restarted {service_name} due to stale routes' >> /var/log/auto-healer.log"
-                    ]
-                },
-                Comment="Auto-Healer: restarting registrator due to stale-route 5xx errors"
-            )
-            cmd_id = response['Command']['CommandId']
-            logger.info(f"SSM command {cmd_id} sent to {instance_id}")
-
-        except ClientError as e:
-            logger.error(f"SSM failed on {instance_id}: {e}")
-
-    return {
-        'statusCode': 200,
-        'body': json.dumps({
-            'message': 'Auto-Healer completed',
-            'remediated_instances': list(instance_ids)
-        })
-    }
+    return {"killed_tasks": tasks_to_kill}
