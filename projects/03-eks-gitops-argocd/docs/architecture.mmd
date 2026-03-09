@@ -1,0 +1,20 @@
+flowchart LR
+    Dev[Developer] -->|git push| GH[GitHub Repo]
+    GH -->|webhook / poll| Argo[ArgoCD]
+    Argo -->|sync manifests| EKS[EKS Cluster]
+
+    subgraph EKS[EKS Cluster - Fargate]
+        direction TB
+        ArgoNS[argocd namespace<br/>ArgoCD Server + Controller]
+        AppNS[app namespace]
+
+        subgraph AppNS[app namespace]
+            Dep[Deployment: nginx x2]
+            Svc[Service: ClusterIP:80]
+            CM[ConfigMap: custom HTML]
+            Dep --> Svc
+            CM -.->|mounted| Dep
+        end
+    end
+
+    GH -.->|GitHub Actions<br/>validates YAML| CI[CI Check]

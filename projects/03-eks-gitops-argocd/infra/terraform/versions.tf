@@ -1,5 +1,5 @@
 terraform {
-  required_version = ">= 1.5.0"
+  required_version = ">= 1.9.0"
 
   required_providers {
     aws = {
@@ -14,5 +14,13 @@ terraform {
       source  = "hashicorp/helm"
       version = "~> 2.12"
     }
+  }
+
+  backend "s3" {
+    bucket         = "yourname-devops-portfolio-tfstate"
+    key            = "eks-gitops/terraform.tfstate"
+    region         = "us-east-1"
+    dynamodb_table = "terraform-locks"
+    encrypt        = true
   }
 }

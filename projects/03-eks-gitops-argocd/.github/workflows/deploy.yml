@@ -1,1 +1,31 @@
-#placeholder for now
+# GitOps CI — validates K8s manifests on push.
+# ArgoCD handles the actual deploy by watching this repo and auto-syncing.
+
+name: Validate K8s Manifests
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "projects/03-eks-gitops-argocd/k8s/**"
+  pull_request:
+    branches: [main]
+    paths:
+      - "projects/03-eks-gitops-argocd/k8s/**"
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate manifests (dry-run)
+        run: |
+          kubectl apply --dry-run=client -f projects/03-eks-gitops-argocd/k8s/
+
+      - name: Lint YAML
+        run: |
+          pip install yamllint
+          yamllint projects/03-eks-gitops-argocd/k8s/
