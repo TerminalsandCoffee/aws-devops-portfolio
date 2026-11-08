@@ -13,7 +13,7 @@ def health():
 
 @app.route("/api/hello")
 def api():
-    return jsonify(message="Hello from Rafs DevOps Academy's ECS Fargate!", instance=os.uname().nodename)
+    return jsonify(message="Hello from Rafs DevOps Academy's ECS Fargate!")
 
 if __name__ == "__main__":
     # Dev only – Gunicorn used in Docker

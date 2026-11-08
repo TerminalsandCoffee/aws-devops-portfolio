@@ -12,7 +12,7 @@ module "vpc" {
   name               = local.name
   cidr               = var.vpc_cidr
   az_count           = var.az_count
-  enable_nat_gateway = false # Fargate = public subnets only
+  enable_nat_gateway = var.enable_nat_gateway # Private Fargate tasks need NAT for ECR/logs
   single_nat_gateway = true
   tags               = local.tags
 }
@@ -42,7 +42,7 @@ module "ecr" {
   source = "../../../../modules/ecr"
 
   name                 = local.name
-  image_tag_mutability = "MUTABLE"
+  image_tag_mutability = "IMMUTABLE"
   scan_on_push         = true
   keep_last_n_images   = 10
   tags                 = local.tags
@@ -53,12 +53,13 @@ module "ecs" {
 
   name                    = local.name
   cluster_name            = "${local.name}-cluster"
-  ecr_image_url           = "${module.ecr.repository_url}:latest"
+  ecr_image_url           = "${module.ecr.repository_url}:${var.image_tag}"
   container_port          = 5000
   task_execution_role_arn = module.iam.task_execution_role_arn
   task_role_arn           = module.iam.task_role_arn
   vpc_id                  = module.vpc.vpc_id
-  subnet_ids              = module.vpc.public_subnet_ids
+  subnet_ids              = module.vpc.private_subnet_ids
+  assign_public_ip        = false
   target_group_arn        = module.alb.target_group_arn
   alb_security_group_id   = module.alb.security_group_id
   desired_count           = 1

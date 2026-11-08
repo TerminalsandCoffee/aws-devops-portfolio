@@ -25,7 +25,13 @@ variable "az_count" {
 }
 
 variable "enable_nat_gateway" {
-  description = "Create NAT GW for private subnets"
+  description = "Create NAT GW so private Fargate tasks can reach ECR and logs"
   type        = bool
-  default     = false # Fargate only needs public subnets
+  default     = true
+}
+
+variable "image_tag" {
+  description = "Immutable image tag to deploy (CI should pass the git SHA)"
+  type        = string
+  default     = "bootstrap"
 }

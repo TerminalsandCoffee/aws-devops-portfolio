@@ -29,7 +29,7 @@ Set the database password via environment variable or Terraform variable:
 
 ```bash
 # Option 1: Environment variable
-export TF_VAR_rds_password="YourSecurePassword123!"
+export TF_VAR_rds_password='<use a unique secret, never commit it>'
 
 # Option 2: Pass via command line
 terraform apply -var="rds_password=YourSecurePassword123!"

@@ -31,6 +31,18 @@ variable "target_group_port" {
   default     = 80
 }
 
+variable "enable_deletion_protection" {
+  description = "Prevent accidental ALB deletion (enable in production)"
+  type        = bool
+  default     = false
+}
+
+variable "ssl_policy" {
+  description = "TLS policy for the HTTPS listener"
+  type        = string
+  default     = "ELBSecurityPolicy-TLS13-1-2-2021-06"
+}
+
 variable "tags" {
   description = "Common tags applied to all ALB resources"
   type        = map(string)

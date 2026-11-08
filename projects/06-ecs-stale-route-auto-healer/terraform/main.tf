@@ -44,10 +44,11 @@ module "alb" {
 module "ecs_asg" {
   source = "../../../modules/ecs-ec2-asg"
 
-  name          = var.cluster_name
-  vpc_id        = data.aws_vpc.default.id
-  subnet_ids    = data.aws_subnets.default.ids
-  instance_type = "t3.small"
+  name                  = var.cluster_name
+  vpc_id                = data.aws_vpc.default.id
+  subnet_ids            = data.aws_subnets.default.ids
+  instance_type         = "t3.small"
+  alb_security_group_id = module.alb.security_group_id
 }
 
 # 6. Cluster Capacity Provider Association
@@ -74,7 +75,7 @@ resource "aws_ecs_task_definition" "nginx" {
   container_definitions = jsonencode([
     {
       name      = "nginx"
-      image     = "nginx:latest"
+      image     = "nginx:1.28-alpine"
       cpu       = 256
       memory    = 256
       essential = true
@@ -175,7 +176,7 @@ resource "aws_iam_role_policy" "lambda_policy" {
           "logs:CreateLogStream",
           "logs:PutLogEvents"
         ]
-        Resource = "*"
+        Resource = "arn:aws:logs:${var.region}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/${var.cluster_name}-auto-healer*"
       },
       {
         Effect = "Allow"

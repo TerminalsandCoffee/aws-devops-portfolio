@@ -4,8 +4,14 @@
 grafana:
   enabled: true
 
-  # Admin password (CHANGE THIS IN PROD!)
-  adminPassword: "admin123holler@ME!"
+  # Never commit an admin password. Create a Kubernetes Secret before install:
+  #   kubectl -n observability create secret generic grafana-admin \
+  #     --from-literal=admin-user=admin \
+  #     --from-literal=admin-password="$(openssl rand -base64 24)"
+  admin:
+    existingSecret: grafana-admin
+    userKey: admin-user
+    passwordKey: admin-password
 
   # Persistence
   persistence:
@@ -14,9 +20,9 @@ grafana:
     accessModes: ["ReadWriteOnce"]
     size: 10Gi
 
-  # Expose via LoadBalancer (for demo)
+  # ClusterIP only. Expose through a private Ingress/ALB with TLS in production.
   service:
-    type: LoadBalancer
+    type: ClusterIP
     port: 80
 
   # Auto-import EKS + Prometheus dashboards
@@ -53,18 +59,14 @@ grafana:
         revision: 1
         datasource: Prometheus
 
-  # Security: Disable anonymous access
   security:
     disable_initial_admin_creation: false
 
-  # Plugins (optional)
   plugins:
     - grafana-piechart-panel
 
-  # Extra env vars (e.g., for AWS region)
   extraEnv:
     AWS_REGION: "us-west-2"
 
-  # Ingress (optional — for prod with ALB)
   ingress:
     enabled: false

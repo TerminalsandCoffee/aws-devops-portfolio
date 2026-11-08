@@ -9,12 +9,12 @@
   - Stashes nothing → zero data loss.
   - Always bases new branch on remote/$MainBranch.
   - Auto-detects GitHub user/repo from remote URL.
-  - Skips commit hooks by default (late-night mercy).
+  - Commit hooks run unless -NoVerify is supplied.
 #>
 param(
   [Parameter(Mandatory)][string]$Message,
   [switch]$Force,
-  [switch]$NoVerify = $true   # change to $false if you want hooks
+  [switch]$NoVerify = $false
 )
 
 # ───── CONFIG ─────
@@ -67,7 +67,7 @@ else {
 }
 
 # ───── 3. STAGE & COMMIT ─────
-git add -A
+git add -u
 if (git diff --cached --quiet) {
     Write-Status "No staged changes after add – aborting." $WARN
     exit 0

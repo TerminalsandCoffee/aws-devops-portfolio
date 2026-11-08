@@ -56,11 +56,17 @@ resource "aws_iam_policy" "prometheus_cloudwatch" {
       {
         Effect = "Allow"
         Action = [
-          "cloudwatch:PutMetricData",
+          "cloudwatch:PutMetricData"
+        ]
+        Resource = "*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
           "logs:CreateLogStream",
           "logs:PutLogEvents"
         ]
-        Resource = "*"
+        Resource = "arn:aws:logs:*:*:log-group:/aws/eks/${var.cluster_name}*"
       }
     ]
   })
