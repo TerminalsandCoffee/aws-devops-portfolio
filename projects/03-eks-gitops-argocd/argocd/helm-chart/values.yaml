@@ -1,11 +1,12 @@
-# ArgoCD Helm values for EKS Fargate deployment
+# Argo CD Helm values for EKS Fargate deployment
+
+global:
+  networkPolicy:
+    create: true
 
 server:
   service:
-    type: LoadBalancer
-  # Run insecure — TLS terminates at the load balancer
-  extraArgs:
-    - --insecure
+    type: ClusterIP
   resources:
     requests:
       cpu: 256m

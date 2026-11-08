@@ -6,7 +6,7 @@ variable "name" {
 variable "image_tag_mutability" {
   description = "Whether tag mutability is MUTABLE or IMMUTABLE"
   type        = string
-  default     = "MUTABLE"
+  default     = "IMMUTABLE"
 }
 
 variable "scan_on_push" {

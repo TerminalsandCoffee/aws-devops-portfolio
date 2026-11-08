@@ -6,13 +6,7 @@ resource "aws_security_group" "bastion" {
   description = "Security group for bastion host"
   vpc_id      = aws_vpc.main.id
 
-  ingress {
-    description = "SSH from anywhere (restrict to your IP in production)"
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]  # Change to your IP/32 in production
-  }
+  # No SSH. Access this host with SSM Session Manager only.
 
   egress {
     description = "Allow all outbound"
@@ -30,14 +24,13 @@ resource "aws_security_group" "bastion" {
   )
 }
 
-# Get latest Amazon Linux 2 AMI
 data "aws_ami" "amazon_linux" {
   most_recent = true
   owners      = ["amazon"]
 
   filter {
     name   = "name"
-    values = ["amzn2-ami-hvm-*-x86_64-gp2"]
+    values = ["al2023-ami-*-kernel-6.1-x86_64"]
   }
 }
 
@@ -73,17 +66,22 @@ resource "aws_iam_instance_profile" "bastion" {
 resource "aws_instance" "bastion" {
   ami           = data.aws_ami.amazon_linux.id
   instance_type = "t3.micro"
-  subnet_id     = aws_subnet.public[0].id
+  subnet_id     = aws_subnet.private[0].id
 
   vpc_security_group_ids = [aws_security_group.bastion.id]
 
-  # Use Systems Manager Session Manager (no SSH key needed)
   iam_instance_profile = aws_iam_instance_profile.bastion.name
+
+  metadata_options {
+    http_endpoint               = "enabled"
+    http_tokens                 = "required"
+    http_put_response_hop_limit = 1
+  }
 
   user_data = <<-EOF
     #!/bin/bash
-    yum update -y
-    yum install -y mysql jq
+    dnf update -y
+    dnf install -y mariadb105 jq
   EOF
 
   tags = merge(

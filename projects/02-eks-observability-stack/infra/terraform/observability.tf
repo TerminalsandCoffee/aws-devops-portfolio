@@ -52,13 +52,23 @@ resource "aws_iam_policy" "observability_permissions" {
         Action = [
           "logs:CreateLogStream",
           "logs:PutLogEvents",
-          "logs:CreateLogGroup",
+          "logs:CreateLogGroup"
+        ]
+        Resource = "arn:aws:logs:*:*:log-group:/aws/eks/${var.cluster_name}*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
           "cloudwatch:PutMetricData",
           "xray:PutTraceSegments",
-          "xray:PutTelemetryRecords",
-          "aps:RemoteWrite"
+          "xray:PutTelemetryRecords"
         ]
         Resource = "*"
+      },
+      {
+        Effect = "Allow"
+        Action   = ["aps:RemoteWrite"]
+        Resource = "arn:aws:aps:*:*:workspace/*"
       }
     ]
   })

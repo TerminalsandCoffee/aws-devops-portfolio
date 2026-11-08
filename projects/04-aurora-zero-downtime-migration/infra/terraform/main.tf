@@ -209,11 +209,19 @@ resource "aws_security_group" "dms" {
   vpc_id      = aws_vpc.main.id
 
   ingress {
-    description = "DMS from VPC"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = [var.vpc_cidr]
+    description     = "MySQL from RDS source to DMS"
+    from_port       = 3306
+    to_port         = 3306
+    protocol        = "tcp"
+    security_groups = [aws_security_group.rds.id]
+  }
+
+  ingress {
+    description     = "MySQL from Aurora target to DMS"
+    from_port       = 3306
+    to_port         = 3306
+    protocol        = "tcp"
+    security_groups = [aws_security_group.aurora.id]
   }
 
   egress {

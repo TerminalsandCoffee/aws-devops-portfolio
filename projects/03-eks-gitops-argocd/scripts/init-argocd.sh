@@ -1,54 +1,47 @@
 #!/usr/bin/env bash
-# Post-deploy helper: configures ArgoCD CLI, registers the repo, and applies the Application CR.
+# Post-deploy helper: port-forwards to the ClusterIP Argo CD server and applies the Application CR.
+# Does not print the initial admin password.
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
-TF_DIR="$PROJECT_DIR/infra/terraform"
 
-echo "=== ArgoCD Init Script ==="
+echo "=== Argo CD Init Script ==="
 echo ""
 
-# 1. Get ArgoCD initial admin password
-echo "[1/5] Retrieving ArgoCD admin password..."
+echo "[1/4] Retrieving Argo CD admin password into a local variable (not printed)..."
 ARGO_PASSWORD=$(kubectl -n argocd get secret argocd-initial-admin-secret \
   -o jsonpath="{.data.password}" | base64 -d)
-echo "  Admin password: $ARGO_PASSWORD"
+echo "  Password retrieved. Rotate this secret after first login; do not log it."
 echo ""
 
-# 2. Get ArgoCD server URL
-echo "[2/5] Getting ArgoCD server URL..."
-ARGO_HOST=$(kubectl get svc argocd-server -n argocd \
-  -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
-ARGO_URL="http://${ARGO_HOST}"
-echo "  ArgoCD URL: $ARGO_URL"
+echo "[2/4] Port-forwarding argocd-server (ClusterIP) to localhost:8443..."
+kubectl -n argocd port-forward svc/argocd-server 8443:443 >/tmp/argocd-port-forward.log 2>&1 &
+PF_PID=$!
+trap 'kill "$PF_PID" 2>/dev/null || true' EXIT
+sleep 3
+echo "  UI: https://localhost:8443"
 echo ""
 
-# 3. Login via CLI
-echo "[3/5] Logging in to ArgoCD CLI..."
-argocd login "$ARGO_HOST" \
+echo "[3/4] Logging in to Argo CD CLI via the port-forward..."
+argocd login localhost:8443 \
   --username admin \
   --password "$ARGO_PASSWORD" \
   --insecure \
   --grpc-web
+unset ARGO_PASSWORD
 echo "  Logged in successfully."
 echo ""
 
-# 4. Apply the Application CR
-echo "[4/5] Applying ArgoCD Application manifest..."
+echo "[4/4] Applying Argo CD Application manifest..."
 kubectl apply -f "$PROJECT_DIR/argocd/application.yaml"
 echo "  Application created."
-echo ""
-
-# 5. Check status
-echo "[5/5] Checking application sync status..."
-argocd app get nginx-demo --grpc-web
 echo ""
 
 echo "=== Setup Complete ==="
 echo ""
 echo "Next steps:"
-echo "  1. Open ArgoCD UI: $ARGO_URL"
-echo "  2. Login: admin / $ARGO_PASSWORD"
-echo "  3. Edit files in k8s/ and push — ArgoCD auto-syncs within ~3 minutes"
+echo "  1. Open https://localhost:8443 (keep this script's port-forward running, or rerun kubectl port-forward)"
+echo "  2. Login as admin using: kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath='{.data.password}' | base64 -d"
+echo "  3. Rotate the initial admin secret and prefer SSO for anything beyond a lab."
 echo "  4. Watch the sync: argocd app get nginx-demo --watch --grpc-web"

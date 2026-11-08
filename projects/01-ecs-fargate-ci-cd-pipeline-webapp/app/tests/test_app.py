@@ -1,26 +1,17 @@
-# Pytest is a lightweight testing framework that lets you verify your Flask app's routes and responses automatically.
-# Think of it as Postman for developers — but fully automated and CI/CD-friendly.
-
-import pytest
 from app import app
 
-@pytest.fixture
-def client():
-    app.config["TESTING"] = True
-    with app.test_client() as client:
-        yield client
 
-def test_home(client):
-    rv = client.get("/")
-    assert rv.status_code == 200
-    assert b"ECS Fargate" in rv.data
-
-def test_health(client):
-    rv = client.get("/health")
-    assert rv.status_code == 200
-    assert rv.json == {"status": "ok"}
+def test_health():
+    client = app.test_client()
+    response = client.get("/health")
+    assert response.status_code == 200
+    assert response.get_json()["status"] == "ok"
 
 
-# To run the tests locally, use the following command:
-# pip install -r requirements.txt pytest
-# pytest app/tests/
+def test_hello_does_not_leak_hostname():
+    client = app.test_client()
+    response = client.get("/api/hello")
+    assert response.status_code == 200
+    payload = response.get_json()
+    assert "instance" not in payload
+    assert "message" in payload

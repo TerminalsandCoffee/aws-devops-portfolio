@@ -44,8 +44,14 @@ variable "vpc_id" {
 }
 
 variable "subnet_ids" {
-  description = "List of subnet IDs (public for Fargate)"
+  description = "List of subnet IDs (private subnets with NAT recommended)"
   type        = list(string)
+}
+
+variable "assign_public_ip" {
+  description = "Assign a public IP to Fargate tasks. Keep false and use private subnets + NAT."
+  type        = bool
+  default     = false
 }
 
 variable "target_group_arn" {

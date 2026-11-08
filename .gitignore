@@ -36,6 +36,8 @@ terraform.rc
 
 # TF plan output
 *.tfplan
+**/tfplan
+**/outputs.txt
 
 # Backup files sometimes created by editors
 *.tf.backup
